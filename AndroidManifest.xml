@@ -5,21 +5,25 @@
     android:versionName="1.0" >
 
     <uses-sdk 
-        android:minSdkVersion="8" 
-        android:targetSdkVersion="11" />
+        android:minSdkVersion="14" 
+        android:targetSdkVersion="19" />
+	<uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:label="@string/app_name" android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+        android:allowBackup="true">
         <activity
             android:label="@string/app_name"
-            android:name=".MainActivity" >
+            android:name="com.firelink.gw2.events.APIActivity" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity 
+            android:name="com.firelink.gw2.events.firstStart.FirstRun" >
+        </activity>n
     </application>
 
 </manifest>
