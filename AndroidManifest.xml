@@ -25,5 +25,4 @@
             android:name="com.firelink.gw2.events.firstStart.FirstRun" >
         </activity>n
     </application>
-
 </manifest>
