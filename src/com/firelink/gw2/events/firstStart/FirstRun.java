@@ -119,13 +119,13 @@ public class FirstRun extends Activity
 			
 			if(region == "North America"){
 				if(adapterNA.isEmpty()){
-					new getServerJSON().execute();
+					new ServerSelectAPI().execute();
 				} else {
 					lvServer.setAdapter(adapterNA);
 				}
 			} else if (region == "Europe"){
 				if(adapterEU.isEmpty()){
-					new getServerJSON().execute();
+					new ServerSelectAPI().execute();
 				} else {
 					lvServer.setAdapter(adapterEU);
 				}
@@ -187,7 +187,7 @@ public class FirstRun extends Activity
 		}
 	};
 
-	public class getServerJSON extends AsyncTask<Void, Void, String>
+	public class ServerSelectAPI extends AsyncTask<Void, Void, String>
 	{
 		protected void onPreExecute()
 		{
