@@ -23,7 +23,7 @@ public class APICaller
 	public static final String API_EVENTS = "https://api.guildwars2.com/v1/events.json?world_id=<WORLD_ID>";
 	public static final String API_EVENT_NAMES = "https://api.guildwars2.com/v1/event_names.json";
 	public static final String API_MAP_NAMES = "https://api.guildwars2.com/v1/map_names.json";
-	public static final String API_WORLD_NAMES = "https://api.guildwars2.com/v1/world_names.json";
+	public static final String API_WORLD_NAMES = "http://api.bitocode.com/1/guildwars/worlds/en/";
 	
 	private String API;
 	private String errorMessage;

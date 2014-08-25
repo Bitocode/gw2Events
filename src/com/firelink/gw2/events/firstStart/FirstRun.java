@@ -75,7 +75,7 @@ public class FirstRun extends Activity
         setContentView(R.layout.first_start);
         
 		//Cache our background data
-		new cacheData().execute();
+		//new cacheData().execute();
 		
         //Initialize globals
         selectedServer = "";
@@ -332,6 +332,8 @@ public class FirstRun extends Activity
 				result = api.getLastError();
 			}
 			
+			Log.d("GW2Events", result + "");
+			
 			return result;
 		}
 
@@ -350,6 +352,7 @@ public class FirstRun extends Activity
 					JSONObject jsonObject 	= json.getJSONObject(i);
 					String key 				= URLDecoder.decode(jsonObject.getString("name"));
 					int value 				= jsonObject.getInt("id");
+					
 					
 					if(region == "North America"){
 						if(value < 2000){

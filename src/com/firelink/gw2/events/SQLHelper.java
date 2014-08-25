@@ -9,18 +9,29 @@ public class SQLHelper extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 2;
 	private static final String DATABASE_NAME = "comFirelinkGW2Events";
-	private String[] databaseQuery;
+	private String[] databaseQueries;
+	private String databaseQuery;
 	
 	public SQLHelper(Context context, String[] query) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		this.databaseQueries = query;
+	}
+	
+	public SQLHelper(Context context, String query) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.databaseQuery = query;
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		for (int i = 0; i < this.databaseQuery.length; i++) {
-			db.execSQL(this.databaseQuery[i]);
-			Log.d("GW2Events", this.databaseQuery[i]);
+		if (this.databaseQueries != null) {
+			for (int i = 0; i < this.databaseQueries.length; i++) {
+				db.execSQL(this.databaseQueries[i]);
+				Log.d("GW2Events", this.databaseQueries[i]);
+			}
+		} else {
+			db.execSQL(this.databaseQuery);
+			Log.d("GW2Events", this.databaseQuery);
 		}
 	}
 
