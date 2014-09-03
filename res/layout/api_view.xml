@@ -27,4 +27,10 @@
         android:textStyle="bold"
         android:layout_below="@id/apiView_gw2LogoImageView" />
     
+    <ListView 
+        android:id="@+id/apiView_eventListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/apiView_resultTextView" />"
+    
 </RelativeLayout>

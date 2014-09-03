@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firelink.gw2.events.firstStart.FirstRun;
@@ -18,6 +21,7 @@ public class APIActivity extends Activity
 	
 	
 	public TextView resultTextView;
+	public ListView eventListView;
 	
 	public int serverID;
 	public String serverName;
@@ -29,19 +33,18 @@ public class APIActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.api_view);
         
+        resultTextView = (TextView)findViewById(R.id.apiView_resultTextView);
+        eventListView  = (ListView)findViewById(R.id.apiView_eventListView);
+        eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        
         SharedPreferences sharedPrefs = getSharedPreferences(PREFS_NAME, 0);
         
-        serverID = sharedPrefs.getInt(PREFS_SERVER_ID, 0);
+        serverID   = sharedPrefs.getInt(PREFS_SERVER_ID, 0);
         serverName = sharedPrefs.getString(PREFS_SERVER_NAME, "Pizza");
-  
-        resultTextView = (TextView)findViewById(R.id.apiView_resultTextView);
         
         if(serverID != 0){
-        	
-        	setServerName();
-        	
+        	initEventView();
         } else {
-        	
         	Intent intent = new Intent(this, FirstRun.class);
         	startActivityForResult(intent, INTENT_SERVER_SELECTOR_REQUEST_CODE);        	
         }
@@ -55,11 +58,34 @@ public class APIActivity extends Activity
     			serverID 	= data.getIntExtra("serverID", 0);
     			serverName 	= data.getStringExtra("serverName");
     		
-    			setServerName();
+    			initEventView();
     		}        	
     	}
     }
     
+    /**
+     * Initiates the events view
+     * 
+     * @return void
+     */
+    private void initEventView()
+    {
+    	//Fix server name. Depends on size of the name
+    	setServerName();
+    	
+    	//Make list adapter to attach to listview
+    	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.event_list_text_view);
+    	adapter.add("Test1");
+    	adapter.add("Test2");
+    	
+    	eventListView.setAdapter(adapter);
+    }
+    
+    /**
+     * Adjusts the server name depending on the size of the name
+     * 
+     * @return void
+     */
     private void setServerName()
     {
     	resultTextView.setText(serverName);
