@@ -29,9 +29,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firelink.gw2.events.APICaller;
+import com.firelink.gw2.objects.*;
 import com.firelink.gw2.events.R;
-import com.firelink.gw2.events.SQLHelper;
 
 public class FirstRun extends Activity
 {
@@ -61,7 +60,7 @@ public class FirstRun extends Activity
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.first_start);
+        setContentView(R.layout.first_start_layout);
         
 		//Cache our background data
 		//new cacheData().execute();
@@ -285,6 +284,7 @@ public class FirstRun extends Activity
 			return true;
 		}	
 	}
+	
 	/**
 	 * This is the class for making our API call to retrieve the server contents.
 	 */

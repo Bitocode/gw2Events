@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/apiView_relativeContainer" >
+		
+        <ImageView
+            android:id="@+id/apiView_gw2HeaderImageView"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/just_a_logo"
+            android:scaleType="fitXY"
+            android:src="@drawable/gw2_header3" />
+
+        <ImageView
+            android:id="@+id/apiView_gw2LogoImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/just_a_logo"
+            android:scaleType="fitStart"
+            android:src="@drawable/gw2logo_transparent" />
+        
+        <TextView
+            android:id="@+id/apiView_resultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center|right"
+            android:layout_marginRight="5dp"
+            android:shadowColor="#000"
+            android:shadowDx="2"
+            android:shadowDy="-2"
+            android:shadowRadius="0.2"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/apiView_eventListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/apiView_relativeContainer"
+        android:divider="@null"
+        android:listSelector="@android:color/transparent" />
+
+</RelativeLayout>

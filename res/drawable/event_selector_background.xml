@@ -2,17 +2,18 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
    
     <item android:state_pressed="true"
-          android:drawable="@color/black" />
+          android:drawable="@color/gw_red_lighter" />
     
     <item android:state_selected="true"
           android:state_activated="true"
-          android:drawable="@color/red" />
+          android:drawable="@color/gw_red" />
     
     <item android:state_activated="true"
-          android:drawable="@color/red" />
+          android:drawable="@color/gw_red" />
     
     <item android:state_selected="true"
-          android:drawable="@color/red" />
+          android:drawable="@color/gw_red" />
     
     <item android:drawable="@android:color/transparent" />
+    
 </selector>
