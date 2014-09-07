@@ -21,18 +21,39 @@
             android:scaleType="fitXY"
             android:src="@drawable/event_level_standard" />
         
-        <TextView
-		    android:id="@+id/eventAdapterTextView"
-		    android:layout_width="0dp"
-		    android:layout_height="fill_parent"
-		    android:layout_weight="1"
-		    android:background="@drawable/event_selector_background"
-		    android:textColor="@color/event_selector_text"
-		    android:textSize="20sp"
-		    android:paddingRight="5dp"
-		    android:paddingLeft="5dp"
-		    android:paddingTop="25dp"
-		    android:paddingBottom="25dp" />
+        <RelativeLayout 
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" >
+            
+            <TextView
+                android:id="@+id/eventAdapterTitleTextView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/event_selector_background"
+                android:textColor="@color/event_selector_text"
+                android:textSize="20sp"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp" />
+            
+            <TextView
+                android:id="@+id/eventAdapterDescriptionTextView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp"
+                android:layout_below="@id/eventAdapterTitleTextView"
+                android:visibility="gone" />
+            
+        </RelativeLayout>
+        
+        
     </LinearLayout>
 
 </LinearLayout>

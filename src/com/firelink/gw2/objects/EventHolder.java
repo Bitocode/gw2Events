@@ -1,8 +1,12 @@
 package com.firelink.gw2.objects;
 
-public class EventHolder 
+
+public class EventHolder
 {
-	String name;
-	String type;
-	int typeID;
+    public String name;
+    public String type;
+    public String description;
+    public int typeID;
+    public int eventID;
+    public boolean displayExtraData;
 }

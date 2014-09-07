@@ -11,7 +11,7 @@
         android:id="@+id/apiView_relativeContainer" >
 		
         <ImageView
-            android:id="@+id/apiView_gw2HeaderImageView"
+            android:id="@+id/eventView_gw2HeaderImageView"
             android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -20,7 +20,7 @@
             android:src="@drawable/gw2_header3" />
 
         <ImageView
-            android:id="@+id/apiView_gw2LogoImageView"
+            android:id="@+id/eventView_gw2LogoImageView"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -29,7 +29,7 @@
             android:src="@drawable/gw2logo_transparent" />
         
         <TextView
-            android:id="@+id/apiView_resultTextView"
+            android:id="@+id/eventView_resultTextView"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center|right"
@@ -42,13 +42,5 @@
             android:textSize="22sp"
             android:textStyle="bold" />
     </RelativeLayout>
-
-    <ListView
-        android:id="@+id/apiView_eventListView"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/apiView_relativeContainer"
-        android:divider="@null"
-        android:listSelector="@android:color/transparent" />
 
 </RelativeLayout>

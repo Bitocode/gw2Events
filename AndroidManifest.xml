@@ -15,7 +15,7 @@
         android:allowBackup="true">
         <activity
             android:label="@string/app_name"
-            android:name="com.firelink.gw2.events.MainActivity" >
+            android:name="com.firelink.gw2.events.EventActivity" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,7 +23,10 @@
         </activity>
         <activity 
             android:name="com.firelink.gw2.events.firstStart.FirstRun" >
-        </activity>n
+        </activity>
+        <activity 
+            android:name="com.firelink.gw2.events.SingleEventActivity" >
+        </activity>
     </application>
 
 </manifest>
