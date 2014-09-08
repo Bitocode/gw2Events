@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	 > 
+	android:orientation="vertical" > 
     
     <LinearLayout 
         android:layout_width="fill_parent"
@@ -30,26 +29,55 @@
                 android:id="@+id/eventAdapterTitleTextView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/event_selector_background"
-                android:textColor="@color/event_selector_text"
                 android:textSize="20sp"
                 android:paddingRight="5dp"
                 android:paddingLeft="5dp"
                 android:paddingTop="25dp"
                 android:paddingBottom="25dp" />
             
-            <TextView
-                android:id="@+id/eventAdapterDescriptionTextView"
+            <RelativeLayout 
+                android:id="@+id/eventAdapterExtraInfoLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:paddingRight="5dp"
-                android:paddingLeft="5dp"
-                android:paddingTop="25dp"
-                android:paddingBottom="25dp"
                 android:layout_below="@id/eventAdapterTitleTextView"
-                android:visibility="gone" />
+                android:visibility="gone" >
+            
+                <TextView
+                    android:id="@+id/eventAdapterDescriptionTextView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="25dp"
+                    android:paddingBottom="25dp" />
+                
+                <TextView
+                    android:id="@+id/eventAdapterWaypointTextView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="25dp"
+                    android:paddingBottom="25dp"
+                    android:layout_below="@id/eventAdapterDescriptionTextView" />
+                
+                <TextView
+                    android:id="@+id/eventAdapterLevelTextView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="25dp"
+                    android:paddingBottom="25dp"
+                    android:layout_below="@id/eventAdapterWaypointTextView" />
+                            
+            </RelativeLayout>
             
         </RelativeLayout>
         

@@ -18,4 +18,10 @@
 	<color name="black">#000000</color>
 	<color name="gw_red">#DC241F</color>
 	<color name="gw_red_lighter">#FF574F</color>
+    <color name="gw_event_level_high">#DC2627</color>
+    <color name="gw_event_level_low">#CCC1AA</color>
+    <color name="gw_event_level_standard">#F7B84E</color>
+    <color name="gw_event_level_high_pressed">#ED3738</color>
+    <color name="gw_event_level_low_pressed">#DDD2BB</color>
+    <color name="gw_event_level_standard_pressed">#F8C95F</color>
 </resources>

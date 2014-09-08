@@ -1,9 +1,6 @@
 package com.firelink.gw2.events;
 
-import com.firelink.gw2.events.firstStart.FirstRun;
-import com.firelink.gw2.objects.APICaller;
-import com.firelink.gw2.objects.EventAdapter;
-import com.firelink.gw2.objects.EventHolder;
+import java.net.URLDecoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +19,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.net.URLDecoder;
+import com.firelink.gw2.events.firstStart.FirstRun;
+import com.firelink.gw2.objects.APICaller;
+import com.firelink.gw2.objects.EventAdapter;
+import com.firelink.gw2.objects.EventHolder;
 
 public class EventActivity extends Activity
 {
@@ -104,11 +104,12 @@ public class EventActivity extends Activity
             //            intent.putExtras(bundle);
             //            startActivity(intent);
             EventHolder temp = eventAdapter.getItem(position);
-            temp.displayExtraData = !temp.displayExtraData;
+            temp.isActive = !temp.isActive;
             eventAdapter.setItem(position, temp);
             ((EventAdapter)eventListView.getAdapter()).notifyDataSetChanged();
         }
     };
+   
 
     /**
      * Initiates the events view
@@ -190,11 +191,13 @@ public class EventActivity extends Activity
                     String name 		= URLDecoder.decode(jsonObject.getString("name"));
                     String type 		= URLDecoder.decode(jsonObject.getString("type"));
                     String description  = URLDecoder.decode(jsonObject.getString("description"));
+                    String waypoint     = URLDecoder.decode(jsonObject.getString("waypoint"));
+                    int level           = jsonObject.getInt("level");
                     int typeID          = jsonObject.getInt("typeID");
                     int eventID         = jsonObject.getInt("actual_event_id");
 
                     //Add to adapter at some point
-                    eventAdapter.add(name, type, description, eventID, typeID);
+                    eventAdapter.add(name, type, description, waypoint, level, eventID, typeID);
                 }
             }
             catch (JSONException e)

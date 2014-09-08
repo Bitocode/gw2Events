@@ -1,6 +1,6 @@
 package com.firelink.gw2.objects;
 
-import com.firelink.gw2.events.R;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,18 +8,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.firelink.gw2.events.R;
 
 public class EventAdapter extends BaseAdapter
 {
 
-    public static class ViewHolder
+    static class ViewHolder
     {
-        public TextView eventNameTV;
-        public TextView eventDescTV;
-        public ImageView eventTypeIV;
+        TextView eventNameTV;
+        TextView eventDescTV;
+        TextView eventWaypointTV;
+        TextView eventLevelTV;
+        ImageView eventTypeIV;
+        RelativeLayout eventExtraInfoRL;
     }
 
     private Context context;
@@ -69,12 +73,14 @@ public class EventAdapter extends BaseAdapter
      * @param type
      * @param typeID
      */
-    public void add(String name, String type, String description, int eventID, int typeID)
+    public void add(String name, String type, String description, String waypoint, int level, int eventID, int typeID)
     {
         EventHolder events = new EventHolder();
         events.name        = name;
         events.type        = type;
         events.description = description;
+        events.waypoint    = waypoint;
+        events.level       = level;
         events.typeID      = typeID;
         events.eventID     = eventID;
 
@@ -100,9 +106,12 @@ public class EventAdapter extends BaseAdapter
 
             convertView = vi.inflate(R.layout.event_adapter, viewGroup, false);
             holder = new ViewHolder();
-            holder.eventNameTV = (TextView)convertView.findViewById(R.id.eventAdapterTitleTextView);
-            holder.eventDescTV = (TextView)convertView.findViewById(R.id.eventAdapterDescriptionTextView);
-            holder.eventTypeIV = (ImageView)convertView.findViewById(R.id.eventAdapterLeftImageView);
+            holder.eventNameTV      = (TextView)convertView.findViewById(R.id.eventAdapterTitleTextView);
+            holder.eventDescTV      = (TextView)convertView.findViewById(R.id.eventAdapterDescriptionTextView);
+            holder.eventWaypointTV  = (TextView)convertView.findViewById(R.id.eventAdapterWaypointTextView);
+            holder.eventLevelTV     = (TextView)convertView.findViewById(R.id.eventAdapterLevelTextView);
+            holder.eventTypeIV      = (ImageView)convertView.findViewById(R.id.eventAdapterLeftImageView);
+            holder.eventExtraInfoRL = (RelativeLayout)convertView.findViewById(R.id.eventAdapterExtraInfoLayout);
             convertView.setTag(holder);
         } else
         {
@@ -112,35 +121,55 @@ public class EventAdapter extends BaseAdapter
         EventHolder tempEvent = getItem(position);
         holder.eventNameTV.setText(tempEvent.name);
         holder.eventDescTV.setText(tempEvent.description);
-
-        if (tempEvent.displayExtraData)
-        {
-            holder.eventDescTV.setVisibility(TextView.VISIBLE);
-        }
-        else
-        {
-            holder.eventDescTV.setVisibility(TextView.GONE);
-        }
+        holder.eventLevelTV.setText(tempEvent.level + "");
+        holder.eventWaypointTV.setText(tempEvent.waypoint);
+        
 
         //Determine which color to add to the eventClass left bar thing
         int eventResource;
+        int eventBGResource;
+        int eventBGPressed;
         switch(tempEvent.typeID)
         {
             case 1:
-                eventResource = R.drawable.event_level_high;
+                eventResource   = R.drawable.event_level_high;
+                eventBGResource = R.color.gw_event_level_high;
+                eventBGPressed  = R.drawable.event_selector_bg_pressed_high;
                 break;
             case 2:
-                eventResource = R.drawable.event_level_standard;
+                eventResource   = R.drawable.event_level_standard;
+                eventBGResource = R.color.gw_event_level_standard;
+                eventBGPressed  = R.drawable.event_selector_bg_pressed_standard;
                 break;
             case 3:
-                eventResource = R.drawable.event_level_low;
+                eventResource   = R.drawable.event_level_low;
+                eventBGResource = R.color.gw_event_level_low;
+                eventBGPressed  = R.drawable.event_selector_bg_pressed_low;
                 break;
             default:
-                eventResource = R.drawable.event_level_standard;
+                eventResource   = R.drawable.event_level_standard;
+                eventBGResource = R.color.gw_event_level_standard;
+                eventBGPressed  = R.drawable.event_selector_bg_pressed_high;
                 break;
         }
 
         holder.eventTypeIV.setImageResource(eventResource);
+        
+        if (tempEvent.isActive)
+        {
+        	holder.eventExtraInfoRL.setVisibility(View.VISIBLE);
+            holder.eventNameTV.setBackgroundResource(eventBGResource);
+            holder.eventNameTV.setTextColor(context.getResources().getColor(R.color.white));
+            holder.eventNameTV.setActivated(true);
+        }
+        else
+        {
+        	holder.eventExtraInfoRL.setVisibility(View.GONE);
+            holder.eventNameTV.setBackgroundResource(eventBGPressed);
+            holder.eventNameTV.setTextColor(context.getResources().getColor(R.color.black));
+            holder.eventNameTV.setActivated(false);
+        }
+        
 
         return (convertView);
     }
