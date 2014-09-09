@@ -1,20 +1,11 @@
 package com.firelink.gw2.objects;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +32,7 @@ public class EventAdapter extends BaseAdapter
 
     private Context context;
     private ArrayList<EventHolder> eventData;
-    
-    private static final String DISK_CACHE_DIR = "media";
-
+    private DiskCacheHelper dCH;
 
     /**
      * 
@@ -55,9 +44,7 @@ public class EventAdapter extends BaseAdapter
 
         this.context   = context;
         this.eventData = new ArrayList<EventHolder>();
-        
-        File cacheDir = getDiskCacheDir(context, DISK_CACHE_DIR);
-
+        this.dCH = new DiskCacheHelper(context);
     }
 
     /**
@@ -103,8 +90,6 @@ public class EventAdapter extends BaseAdapter
         events.eventID     = eventID;
 
         this.eventData.add(events);
-        
-        new CacheImagesTask().execute(eventData.size() - 1);
 
         this.notifyDataSetChanged();
     }
@@ -182,6 +167,13 @@ public class EventAdapter extends BaseAdapter
             holder.eventNameTV.setBackgroundResource(eventBGResource);
             holder.eventNameTV.setTextColor(context.getResources().getColor(R.color.white));
             holder.eventNameTV.setActivated(true);
+            
+            //Get image
+            if (tempEvent.image == null) {
+            	File tempFile = new File(this.dCH.getMediaCachePath() + DiskCacheHelper.EVENTS_CACHE_DIR, tempEvent.imagePath);
+            	tempEvent.image = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+            }
+            
             holder.eventImageIV.setImageDrawable(tempEvent.image);
         }
         else
@@ -229,49 +221,6 @@ public class EventAdapter extends BaseAdapter
     public void setItem(int position, EventHolder event)
     {
         eventData.set(position, event);
-    }
-    
-    
-    public static File getDiskCacheDir(Context context, String name)
-    {
-    	//Check if media is mounted
-    	final String cachePath =
-    			Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || 
-    				!Environment.isExternalStorageRemovable() ? context.getExternalCacheDir().getPath() :
-    					context.getCacheDir().getPath();
-    	
-    	return new File(cachePath + File.separator + name);
-    }
-    
-    public class CacheImagesTask extends AsyncTask<Integer, Void, Void>
-    {
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Integer...params)
-        {
-    		Bitmap bm = null;
-        	try {
-	        	URL aURL = new URL(eventData.get(params[0]).imagePath);
-	            URLConnection conn = aURL.openConnection();
-	            conn.connect();
-	            InputStream is = conn.getInputStream();
-	            BufferedInputStream bis = new BufferedInputStream(is);
-	            bm = BitmapFactory.decodeStream(bis);
-	            bis.close();
-	            is.close();
-        	} catch (IOException e) {
-        		Log.d("GW2Evnets", e.getMessage());
-        	}
-        	
-        	eventData.get(params[0]).image = new BitmapDrawable(bm);
-        	
-			return null;	
-        }
     }
 }
 

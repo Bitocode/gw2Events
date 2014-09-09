@@ -1,9 +1,5 @@
 package com.firelink.gw2.events;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 
 import org.json.JSONArray;
@@ -15,7 +11,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +21,7 @@ import android.widget.TextView;
 
 import com.firelink.gw2.events.firstStart.FirstRun;
 import com.firelink.gw2.objects.APICaller;
+import com.firelink.gw2.objects.DiskCacheHelper;
 import com.firelink.gw2.objects.EventAdapter;
 import com.firelink.gw2.objects.EventHolder;
 
@@ -189,6 +185,7 @@ public class EventActivity extends Activity
             {
                 JSONArray json;
                 json = new JSONArray(result);
+                DiskCacheHelper dCH = new DiskCacheHelper(context);
 
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
@@ -204,7 +201,9 @@ public class EventActivity extends Activity
                     int eventID          = jsonObject.getInt("actual_event_id");
 
                     //Add to adapter at some point
-                    eventAdapter.add(name, type, description, waypoint, imagePath + imageFileName, level, eventID, typeID);
+                    eventAdapter.add(name, type, description, waypoint, imageFileName, level, eventID, typeID);
+                    
+                    dCH.cacheRemoteMedia(imagePath + imageFileName, DiskCacheHelper.EVENTS_CACHE_DIR, imageFileName);
                 }
             }
             catch (JSONException e)
