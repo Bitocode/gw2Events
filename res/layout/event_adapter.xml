@@ -41,7 +41,18 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/eventAdapterTitleTextView"
                 android:visibility="gone" >
-            
+                
+                <ImageView 
+                    android:id="@+id/eventAdapterImageImageView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="25dp"
+                    android:paddingBottom="25dp"
+                    android:scaleType="fitXY"
+                    android:adjustViewBounds="true"
+                    />
                 <TextView
                     android:id="@+id/eventAdapterDescriptionTextView"
                     android:layout_width="fill_parent"
@@ -51,7 +62,8 @@
                     android:paddingRight="5dp"
                     android:paddingLeft="5dp"
                     android:paddingTop="25dp"
-                    android:paddingBottom="25dp" />
+                    android:paddingBottom="25dp"
+                    android:layout_below="@id/eventAdapterImageImageView" />
                 
                 <TextView
                     android:id="@+id/eventAdapterWaypointTextView"

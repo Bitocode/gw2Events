@@ -1,5 +1,9 @@
 package com.firelink.gw2.events;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 
 import org.json.JSONArray;
@@ -11,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -188,16 +193,18 @@ public class EventActivity extends Activity
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
 
-                    String name 		= URLDecoder.decode(jsonObject.getString("name"));
-                    String type 		= URLDecoder.decode(jsonObject.getString("type"));
-                    String description  = URLDecoder.decode(jsonObject.getString("description"));
-                    String waypoint     = URLDecoder.decode(jsonObject.getString("waypoint"));
-                    int level           = jsonObject.getInt("level");
-                    int typeID          = jsonObject.getInt("typeID");
-                    int eventID         = jsonObject.getInt("actual_event_id");
+                    String name 		 = URLDecoder.decode(jsonObject.getString("name"));
+                    String type 		 = URLDecoder.decode(jsonObject.getString("type"));
+                    String description   = URLDecoder.decode(jsonObject.getString("description"));
+                    String waypoint      = URLDecoder.decode(jsonObject.getString("waypoint"));
+                    String imagePath     = URLDecoder.decode(jsonObject.getString("imagePath"));
+                    String imageFileName = URLDecoder.decode(jsonObject.getString("imageFileName"));
+                    int level            = jsonObject.getInt("level");
+                    int typeID           = jsonObject.getInt("typeID");
+                    int eventID          = jsonObject.getInt("actual_event_id");
 
                     //Add to adapter at some point
-                    eventAdapter.add(name, type, description, waypoint, level, eventID, typeID);
+                    eventAdapter.add(name, type, description, waypoint, imagePath + imageFileName, level, eventID, typeID);
                 }
             }
             catch (JSONException e)

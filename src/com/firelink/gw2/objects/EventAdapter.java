@@ -1,8 +1,20 @@
 package com.firelink.gw2.objects;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +35,14 @@ public class EventAdapter extends BaseAdapter
         TextView eventWaypointTV;
         TextView eventLevelTV;
         ImageView eventTypeIV;
+        ImageView eventImageIV;
         RelativeLayout eventExtraInfoRL;
     }
 
     private Context context;
     private ArrayList<EventHolder> eventData;
+    
+    private static final String DISK_CACHE_DIR = "media";
 
 
     /**
@@ -40,6 +55,8 @@ public class EventAdapter extends BaseAdapter
 
         this.context   = context;
         this.eventData = new ArrayList<EventHolder>();
+        
+        File cacheDir = getDiskCacheDir(context, DISK_CACHE_DIR);
 
     }
 
@@ -73,18 +90,21 @@ public class EventAdapter extends BaseAdapter
      * @param type
      * @param typeID
      */
-    public void add(String name, String type, String description, String waypoint, int level, int eventID, int typeID)
+    public void add(String name, String type, String description, String waypoint, String imageFileName, int level, int eventID, int typeID)
     {
         EventHolder events = new EventHolder();
         events.name        = name;
         events.type        = type;
         events.description = description;
         events.waypoint    = waypoint;
+        events.imagePath   = imageFileName;
         events.level       = level;
         events.typeID      = typeID;
         events.eventID     = eventID;
 
         this.eventData.add(events);
+        
+        new CacheImagesTask().execute(eventData.size() - 1);
 
         this.notifyDataSetChanged();
     }
@@ -112,6 +132,7 @@ public class EventAdapter extends BaseAdapter
             holder.eventLevelTV     = (TextView)convertView.findViewById(R.id.eventAdapterLevelTextView);
             holder.eventTypeIV      = (ImageView)convertView.findViewById(R.id.eventAdapterLeftImageView);
             holder.eventExtraInfoRL = (RelativeLayout)convertView.findViewById(R.id.eventAdapterExtraInfoLayout);
+            holder.eventImageIV     = (ImageView)convertView.findViewById(R.id.eventAdapterImageImageView);
             convertView.setTag(holder);
         } else
         {
@@ -161,13 +182,16 @@ public class EventAdapter extends BaseAdapter
             holder.eventNameTV.setBackgroundResource(eventBGResource);
             holder.eventNameTV.setTextColor(context.getResources().getColor(R.color.white));
             holder.eventNameTV.setActivated(true);
+            holder.eventImageIV.setImageDrawable(tempEvent.image);
         }
         else
         {
         	holder.eventExtraInfoRL.setVisibility(View.GONE);
-            holder.eventNameTV.setBackgroundResource(eventBGPressed);
+            //holder.eventNameTV.setBackgroundResource(eventBGPressed);
+        	holder.eventNameTV.setBackgroundResource(eventBGPressed);
             holder.eventNameTV.setTextColor(context.getResources().getColor(R.color.black));
             holder.eventNameTV.setActivated(false);
+            holder.eventImageIV.setImageDrawable(null);
         }
         
 
@@ -205,6 +229,49 @@ public class EventAdapter extends BaseAdapter
     public void setItem(int position, EventHolder event)
     {
         eventData.set(position, event);
+    }
+    
+    
+    public static File getDiskCacheDir(Context context, String name)
+    {
+    	//Check if media is mounted
+    	final String cachePath =
+    			Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || 
+    				!Environment.isExternalStorageRemovable() ? context.getExternalCacheDir().getPath() :
+    					context.getCacheDir().getPath();
+    	
+    	return new File(cachePath + File.separator + name);
+    }
+    
+    public class CacheImagesTask extends AsyncTask<Integer, Void, Void>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Integer...params)
+        {
+    		Bitmap bm = null;
+        	try {
+	        	URL aURL = new URL(eventData.get(params[0]).imagePath);
+	            URLConnection conn = aURL.openConnection();
+	            conn.connect();
+	            InputStream is = conn.getInputStream();
+	            BufferedInputStream bis = new BufferedInputStream(is);
+	            bm = BitmapFactory.decodeStream(bis);
+	            bis.close();
+	            is.close();
+        	} catch (IOException e) {
+        		Log.d("GW2Evnets", e.getMessage());
+        	}
+        	
+        	eventData.get(params[0]).image = new BitmapDrawable(bm);
+        	
+			return null;	
+        }
     }
 }
 

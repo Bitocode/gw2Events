@@ -23,10 +23,7 @@
         </activity>
         <activity 
             android:name="com.firelink.gw2.events.firstStart.FirstRun" >
-        </activity>
-        <activity 
-            android:name="com.firelink.gw2.events.SingleEventActivity" >
-        </activity>
+        </activity>n
     </application>
 
 </manifest>
