@@ -46,7 +46,7 @@
     <ListView
         android:id="@+id/apiView_eventListView"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/apiView_relativeContainer"
         android:divider="@null"
         android:listSelector="@android:color/transparent" />

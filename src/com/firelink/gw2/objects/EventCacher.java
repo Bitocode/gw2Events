@@ -8,15 +8,19 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
-public class DiskCacheHelper 
+public class EventCacher 
 {	
 	final private static String MEDIA_CACHE_DIR = "media";
+	final private static String EVENTS_TABLE_NAME = "tblEvents";
+	
 	final public static String EVENTS_CACHE_DIR = "eventsMedia";
 	
 	private Context context;
@@ -24,7 +28,7 @@ public class DiskCacheHelper
 	
 	public HashMap<String, BitmapDrawable> images;
 	
-	public DiskCacheHelper(Context context)
+	public EventCacher(Context context)
 	{
 		this.context = context;
 		
@@ -52,6 +56,13 @@ public class DiskCacheHelper
 		
 		new CacheMediaTask().execute(source, path, fileName);
 	}
+	
+	public void cacheEventsAPI(JSONObject json)
+	{
+		
+	}
+	
+	
 	
 	private class CacheMediaTask extends AsyncTask<String, Void, Void>
     {

@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.firelink.gw2.events.firstStart.FirstRun;
 import com.firelink.gw2.objects.APICaller;
-import com.firelink.gw2.objects.DiskCacheHelper;
+import com.firelink.gw2.objects.EventCacher;
 import com.firelink.gw2.objects.EventAdapter;
 import com.firelink.gw2.objects.EventHolder;
 
@@ -185,7 +185,7 @@ public class EventActivity extends Activity
             {
                 JSONArray json;
                 json = new JSONArray(result);
-                DiskCacheHelper dCH = new DiskCacheHelper(context);
+                EventCacher dCH = new EventCacher(context);
 
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
@@ -203,7 +203,7 @@ public class EventActivity extends Activity
                     //Add to adapter at some point
                     eventAdapter.add(name, type, description, waypoint, imageFileName, level, eventID, typeID);
                     
-                    dCH.cacheRemoteMedia(imagePath + imageFileName, DiskCacheHelper.EVENTS_CACHE_DIR, imageFileName);
+                    dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.EVENTS_CACHE_DIR, imageFileName);
                 }
             }
             catch (JSONException e)

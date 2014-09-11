@@ -32,7 +32,7 @@ public class EventAdapter extends BaseAdapter
 
     private Context context;
     private ArrayList<EventHolder> eventData;
-    private DiskCacheHelper dCH;
+    private EventCacher dCH;
 
     /**
      * 
@@ -44,7 +44,7 @@ public class EventAdapter extends BaseAdapter
 
         this.context   = context;
         this.eventData = new ArrayList<EventHolder>();
-        this.dCH = new DiskCacheHelper(context);
+        this.dCH = new EventCacher(context);
     }
 
     /**
@@ -170,7 +170,7 @@ public class EventAdapter extends BaseAdapter
             
             //Get image
             if (tempEvent.image == null) {
-            	File tempFile = new File(this.dCH.getMediaCachePath() + DiskCacheHelper.EVENTS_CACHE_DIR, tempEvent.imagePath);
+            	File tempFile = new File(this.dCH.getMediaCachePath() + EventCacher.EVENTS_CACHE_DIR, tempEvent.imagePath);
             	tempEvent.image = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
             }
             
