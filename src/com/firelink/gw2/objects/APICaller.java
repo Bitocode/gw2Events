@@ -18,22 +18,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.SparseArray;
+
 public class APICaller 
 {
-	public static final String API_EVENTS      = "https://api.guildwars2.com/v1/events.json?world_id=<WORLD_ID>";
-	public static final String API_EVENT_NAMES = "http://api.bitocode.com/1/guildwars/events/<WORLD_ID>";
-	public static final String API_MAP_NAMES   = "https://api.guildwars2.com/v1/map_names.json";
-	public static final String API_WORLD_NAMES = "http://api.bitocode.com/1/guildwars/worlds/en/";
+	public static final String LANG_ENGLISH = "en";
+	public static final String LANG_FRENCH = "fr";
+	public static final String LANG_SPANISH = "es";
+	public static final String LANG_GERMAN = "de";
+	
+	public static final String API_EVENTS        = "https://api.guildwars2.com/v1/events.json?world_id=<WORLD_ID>";
+	public static final String API_EVENT_NAMES   = "http://api.bitocode.com/1/guildwars/event_names/<LANG>";
+	public static final String API_EVENT_DETAILS = "http://api.bitocode.com/1/guildwars/event_details/<LANG>";
+	public static final String API_MAP_NAMES     = "https://api.guildwars2.com/v1/map_names.json";
+	public static final String API_WORLD_NAMES   = "http://api.bitocode.com/1/guildwars/world_names/en/";
 	
 	private String API;
 	private String errorMessage;
+	private String language;
+	private SparseArray<HashMap<String, String>> apiData;
 	private int worldID;
-	private HashMap<Integer, HashMap<String, String>> apiData;
 	
 	public APICaller()
 	{
 		//Default constructor. Set defaults
-		this.apiData = new HashMap<Integer, HashMap<String, String>>();
+		this.apiData = new SparseArray<HashMap<String, String>>();
 		this.API = APICaller.API_EVENTS;
 		this.worldID = 1013;
 		this.errorMessage = "";
@@ -54,6 +63,18 @@ public class APICaller
 		if (APICaller.API_EVENTS == this.API|| APICaller.API_EVENT_NAMES == this.API){
 			this.worldID = world;
 			this.API = this.API.replace("<WORLD_ID>", this.worldID + "");
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean setLanguage(String language)
+	{
+		if (APICaller.API_EVENT_NAMES == this.API)
+		{
+			this.language = language;
+			this.API = this.API.replace("<LANG>", this.language);
 			return true;
 		}
 		
@@ -110,13 +131,14 @@ public class APICaller
 			
 			for(int i = 0; i < json.length(); i++){
 				JSONObject jsonObject 	= json.getJSONObject(i);
-				Iterator iterator = jsonObject.keys();
+				Iterator<?> iterator = jsonObject.keys();
 				
 				HashMap<String, String> tempMap = new HashMap<String, String>();
 				while(iterator.hasNext()) {
 					String key = iterator.next().toString();
 					tempMap.put(key, jsonObject.getString(key));
 				}
+				
 				this.apiData.put(i, tempMap);
 				
 				tempMap = null;
@@ -132,7 +154,7 @@ public class APICaller
 		return true;
 	}
 	
-	public HashMap<Integer, HashMap<String, String>> getAPIData()
+	public SparseArray<HashMap<String, String>> getAPIData()
 	{
 		return this.apiData;
 	}
@@ -140,7 +162,7 @@ public class APICaller
 	public String getJSONString()
 	{
 		String result = "";
-		HashMap<Integer, HashMap<String, String>> map = this.apiData;
+		SparseArray<HashMap<String, String>> map = this.apiData;
 		
 		result += "[";
 		for (int j = 0; j < map.size(); j++) {

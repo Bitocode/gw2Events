@@ -19,56 +19,47 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.firelink.gw2.events.firstStart.FirstRun;
-import com.firelink.gw2.objects.APICaller;
-import com.firelink.gw2.objects.EventCacher;
-import com.firelink.gw2.objects.EventAdapter;
-import com.firelink.gw2.objects.EventHolder;
+import com.firelink.gw2.objects.*;
 
-public class EventActivity extends Activity
+public class EventNamesView extends Activity
 {
-    public static final String PREFS_NAME 			= "GW2EventReminderPreferences";
-    public static final String PREFS_SERVER_ID 		= "SelectedServerID";
-    public static final String PREFS_SERVER_NAME 	= "SelectedServerName";
-
     public static final int INTENT_SERVER_SELECTOR_REQUEST_CODE = 143;
 
-    public Activity activity;
-    public Context context;
+    protected Activity activity;
+    protected Context context;
 
-    public TextView resultTextView;
-    public ListView eventListView;
-    public ProgressDialog eventProgDialog;
+    protected TextView logoTextView;
+    protected ListView eventListView;
+    protected ProgressDialog eventProgDialog;
 
-    public int serverID;
-    public String serverName;
-    //public ArrayAdapter<String> eventAdapter;
-    public EventAdapter eventAdapter;
+    protected int serverID;
+    protected String serverName;
+    protected EventAdapter eventAdapter;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.event_list_layout);
+        setContentView(R.layout.event_names_layout);
 
         activity = this;
         context  = this;
 
-        resultTextView = (TextView)findViewById(R.id.apiView_resultTextView);
-        eventListView  = (ListView)findViewById(R.id.apiView_eventListView);
+        logoTextView = (TextView)findViewById(R.id.eventNamesView_logoTextView);
+        eventListView  = (ListView)findViewById(R.id.eventNamesView_eventListView);
         eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         eventListView.setOnItemClickListener(eventSelectAdapterView);
 
-        SharedPreferences sharedPrefs = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences sharedPrefs = getSharedPreferences(EventHolder.PREFS_NAME, 0);
 
-        serverID   = sharedPrefs.getInt(PREFS_SERVER_ID, 0);
-        serverName = sharedPrefs.getString(PREFS_SERVER_NAME, "Pizza");
+        serverID   = sharedPrefs.getInt(EventHolder.PREFS_SERVER_ID, 0);
+        serverName = sharedPrefs.getString(EventHolder.PREFS_SERVER_NAME, "Pizza");
 
         if(serverID != 0){
             initEventView();
         } else {
-            Intent intent = new Intent(this, FirstRun.class);
+            Intent intent = new Intent(this, WorldView.class);
             startActivityForResult(intent, INTENT_SERVER_SELECTOR_REQUEST_CODE);
         }
     }
@@ -86,32 +77,7 @@ public class EventActivity extends Activity
             }
         }
     }
-
-    AdapterView.OnItemClickListener eventSelectAdapterView = new AdapterView.OnItemClickListener()
-    {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-        {
-            //            Bundle bundle = new Bundle();
-            //            EventHolder tempEvent = eventAdapter.getItem(position);
-            //
-            //            bundle.putString("name", tempEvent.name);
-            //            bundle.putString("description", tempEvent.description);
-            //            bundle.putString("type", tempEvent.type);
-            //            bundle.putInt("typeID", tempEvent.typeID);
-            //            bundle.putInt("eventID", tempEvent.eventID);
-            //
-            //            Intent intent = new Intent(activity, SingleEventActivity.class);
-            //            intent.putExtras(bundle);
-            //            startActivity(intent);
-            EventHolder temp = eventAdapter.getItem(position);
-            temp.isActive = !temp.isActive;
-            eventAdapter.setItem(position, temp);
-            ((EventAdapter)eventListView.getAdapter()).notifyDataSetChanged();
-        }
-    };
-   
-
+    
     /**
      * Initiates the events view
      * 
@@ -129,7 +95,7 @@ public class EventActivity extends Activity
 
         new EventSelectAPI().execute();
     }
-
+    
     /**
      * Adjusts the server name depending on the size of the name
      * 
@@ -137,8 +103,24 @@ public class EventActivity extends Activity
      */
     private void setServerName()
     {
-        resultTextView.setText(serverName);
+        logoTextView.setText(serverName);
     }
+
+    AdapterView.OnItemClickListener eventSelectAdapterView = new AdapterView.OnItemClickListener()
+    {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            Bundle bundle = new Bundle();
+            EventHolder tempEvent = eventAdapter.getItem(position);
+
+            bundle.putString("eventID", tempEvent.eventID);
+
+            Intent intent = new Intent(activity, EventDetailsView.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    };
 
     /**
      * This is the class for making our API call to retrieve the event contents.
@@ -165,7 +147,7 @@ public class EventActivity extends Activity
             APICaller api = new APICaller();
 
             api.setAPI(APICaller.API_EVENT_NAMES);
-            api.setWorld(serverID);
+            api.setLanguage(APICaller.LANG_ENGLISH);
 
             if (api.callAPI()) {
                 result = api.getJSONString();
@@ -185,25 +167,20 @@ public class EventActivity extends Activity
             {
                 JSONArray json;
                 json = new JSONArray(result);
-                EventCacher dCH = new EventCacher(context);
+                //EventCacher dCH = new EventCacher(context);
 
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
 
-                    String name 		 = URLDecoder.decode(jsonObject.getString("name"));
-                    String type 		 = URLDecoder.decode(jsonObject.getString("type"));
-                    String description   = URLDecoder.decode(jsonObject.getString("description"));
-                    String waypoint      = URLDecoder.decode(jsonObject.getString("waypoint"));
-                    String imagePath     = URLDecoder.decode(jsonObject.getString("imagePath"));
-                    String imageFileName = URLDecoder.decode(jsonObject.getString("imageFileName"));
-                    int level            = jsonObject.getInt("level");
-                    int typeID           = jsonObject.getInt("typeID");
-                    int eventID          = jsonObject.getInt("actual_event_id");
+                    String name 		 = URLDecoder.decode(jsonObject.getString("short_name"));
+                    String description   = URLDecoder.decode(jsonObject.getString("name"));
+                    String eventID       = URLDecoder.decode(jsonObject.getString("id"));
+                    int typeID           = jsonObject.getInt("event_class_id");
 
                     //Add to adapter at some point
-                    eventAdapter.add(name, type, description, waypoint, imageFileName, level, eventID, typeID);
+                    eventAdapter.add(name, description, eventID, typeID);
                     
-                    dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.EVENTS_CACHE_DIR, imageFileName);
+                    //dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.EVENTS_CACHE_DIR, imageFileName);
                 }
             }
             catch (JSONException e)

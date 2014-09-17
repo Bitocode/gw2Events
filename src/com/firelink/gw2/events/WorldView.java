@@ -1,4 +1,4 @@
-package com.firelink.gw2.events.firstStart;
+package com.firelink.gw2.events;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -32,14 +32,8 @@ import android.widget.Toast;
 import com.firelink.gw2.objects.*;
 import com.firelink.gw2.events.R;
 
-public class FirstRun extends Activity
-{
-	
-	public static final String PREFS_NAME 			= "GW2EventReminderPreferences";
-	public static final String PREFS_SERVER_ID 		= "SelectedServerID";
-	public static final String PREFS_SERVER_NAME 	= "SelectedServerName";
-	
-	
+public class WorldView extends Activity
+{	
 	public String region;
 	public String selectedServer;
 	public Activity activity;
@@ -60,7 +54,7 @@ public class FirstRun extends Activity
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.first_start_layout);
+        setContentView(R.layout.world_view_layout);
         
 		//Cache our background data
 		//new cacheData().execute();
@@ -71,14 +65,14 @@ public class FirstRun extends Activity
         context 	= this;
         activity 	= this;
              
-        lvServer 		= (ListView)findViewById(R.id.firstRun_serverListView);
-		adapterNA	 	= new ArrayAdapter<String>(this, R.layout.server_list_text_view);
-		adapterEU	 	= new ArrayAdapter<String>(this, R.layout.server_list_text_view);
+        lvServer 		= (ListView)findViewById(R.id.worldView_serverListView);
+		adapterNA	 	= new ArrayAdapter<String>(this, R.layout.world_view_serverlist_textview);
+		adapterEU	 	= new ArrayAdapter<String>(this, R.layout.world_view_serverlist_textview);
 		naServerID 		= new HashMap<String, Integer>();
 		euServerID		= new HashMap<String, Integer>();
 		
 		//Preferences
-		sharedPrefs 		= getSharedPreferences(PREFS_NAME, 0);
+		sharedPrefs 		= getSharedPreferences(EventHolder.PREFS_NAME, 0);
 		sharedPrefsEditor 	= sharedPrefs.edit();
 	
         //Initialize the spinner
@@ -90,7 +84,7 @@ public class FirstRun extends Activity
         ArrayAdapter<String> regionSpinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, regionList);
         regionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         
-		regionSpinner = (Spinner)findViewById(R.id.firstRun_serverRegionSpinner);
+		regionSpinner = (Spinner)findViewById(R.id.worldView_serverRegionSpinner);
 		regionSpinner.setAdapter(regionSpinnerAdapter);
 		regionSpinner.setOnItemSelectedListener(regionSpinnerSelector);
 		
@@ -100,7 +94,7 @@ public class FirstRun extends Activity
 		lvServer.setOnItemClickListener(lvServerHandler);
 		
 		//Initialize the server select button
-		Button serverSelectButton = (Button)findViewById(R.id.firstRun_serverSelectButton);
+		Button serverSelectButton = (Button)findViewById(R.id.worldView_serverSelectButton);
 		
 		serverSelectButton.setOnClickListener(serverSelectButtonHandler);
 		
@@ -172,8 +166,8 @@ public class FirstRun extends Activity
 				selectedServerID = euServerID.get(selectedServer);
 			}
 			
-			sharedPrefsEditor.putInt(PREFS_SERVER_ID, selectedServerID);
-			sharedPrefsEditor.putString(PREFS_SERVER_NAME, selectedServer);
+			sharedPrefsEditor.putInt(EventHolder.PREFS_SERVER_ID, selectedServerID);
+			sharedPrefsEditor.putString(EventHolder.PREFS_SERVER_NAME, selectedServer);
 			sharedPrefsEditor.apply();
 			
 			Toast.makeText(context, "Server ID Saved", Toast.LENGTH_LONG).show();

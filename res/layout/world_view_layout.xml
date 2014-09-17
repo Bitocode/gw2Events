@@ -6,7 +6,7 @@
 
     
     <ImageView 
-    	android:id="@+id/firstRun_gw2LogoImageView"
+    	android:id="@+id/worldView_gw2LogoImageView"
     	android:layout_width="fill_parent"
     	android:layout_height="80dp"
     	android:layout_alignParentTop="true" 
@@ -15,29 +15,29 @@
     	android:contentDescription="@string/just_a_logo"/>
     
     <TextView
-        android:id="@+id/firstRun_descriptionTextView"
+        android:id="@+id/worldView_descriptionTextView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/firstRun_gw2LogoImageView"
+        android:layout_below="@id/worldView_gw2LogoImageView"
         android:paddingLeft="5dp"
     	android:paddingRight="5dp"
         android:gravity="center_horizontal|top"
         android:text="@string/please_select_your_default_server_you_can_always_change_this_later_in_the_settings_" />
     
     <TextView
-        android:id="@+id/firstRun_regionTextView"
+        android:id="@+id/worldView_regionTextView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingTop="25dp"
-        android:layout_below="@id/firstRun_descriptionTextView"
+        android:layout_below="@id/worldView_descriptionTextView"
         android:gravity="center"
         android:text="@string/select_a_region"/>
 
     <Spinner
-        android:id="@+id/firstRun_serverRegionSpinner"
+        android:id="@+id/worldView_serverRegionSpinner"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/firstRun_regionTextView"
+        android:layout_below="@+id/worldView_regionTextView"
         android:paddingLeft="5dp"
     	android:paddingRight="5dp"
         android:layout_centerHorizontal="true"
@@ -48,11 +48,11 @@
         android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentBottom="true"
-	    android:layout_below="@id/firstRun_serverRegionSpinner"
+	    android:layout_below="@id/worldView_serverRegionSpinner"
 	    android:orientation="vertical" >
         
         <TextView 
-	        android:id="@+id/firstRun_serverTextView"
+	        android:id="@+id/worldView_serverTextView"
 	        android:layout_width="fill_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="0.5"
@@ -65,7 +65,7 @@
             android:layout_weight="6">
             
             <ListView
-                android:id="@+id/firstRun_serverListView"
+                android:id="@+id/worldView_serverListView"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent" />
             
@@ -77,7 +77,7 @@
             android:layout_weight="1" >
             
             <Button 
-		        android:id="@+id/firstRun_serverSelectButton"
+		        android:id="@+id/worldView_serverSelectButton"
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
 		        android:background="@drawable/red_button"

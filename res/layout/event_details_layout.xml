@@ -8,10 +8,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/apiView_relativeContainer" >
+        android:id="@+id/eventDetailsView_relativeContainer" >
 		
         <ImageView
-            android:id="@+id/eventView_gw2HeaderImageView"
+            android:id="@+id/eventDetailsView_gw2HeaderImageView"
             android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -20,7 +20,7 @@
             android:src="@drawable/gw2_header3" />
 
         <ImageView
-            android:id="@+id/eventView_gw2LogoImageView"
+            android:id="@+id/eventDetailsView_gw2LogoImageView"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -29,7 +29,7 @@
             android:src="@drawable/gw2logo_transparent" />
         
         <TextView
-            android:id="@+id/eventView_resultTextView"
+            android:id="@+id/eventDetailsView_logoTextView"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center|right"

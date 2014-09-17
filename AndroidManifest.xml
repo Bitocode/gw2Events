@@ -17,15 +17,18 @@
         android:allowBackup="true">
         <activity
             android:label="@string/app_name"
-            android:name="com.firelink.gw2.events.EventActivity" >
+            android:name="com.firelink.gw2.events.EventNamesView" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity 
-            android:name="com.firelink.gw2.events.firstStart.FirstRun" >
-        </activity>n
+            android:name="com.firelink.gw2.events.WorldView" >
+        </activity>
+        <activity 
+            android:name="com.firelink.gw2.events.EventDetailsView">
+        </activity>
     </application>
 
 </manifest>

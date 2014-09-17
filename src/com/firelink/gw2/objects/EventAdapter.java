@@ -1,11 +1,8 @@
 package com.firelink.gw2.objects;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,16 +20,12 @@ public class EventAdapter extends BaseAdapter
     {
         TextView eventNameTV;
         TextView eventDescTV;
-        TextView eventWaypointTV;
-        TextView eventLevelTV;
         ImageView eventTypeIV;
-        ImageView eventImageIV;
         RelativeLayout eventExtraInfoRL;
     }
 
     private Context context;
     private ArrayList<EventHolder> eventData;
-    private EventCacher dCH;
 
     /**
      * 
@@ -44,7 +37,6 @@ public class EventAdapter extends BaseAdapter
 
         this.context   = context;
         this.eventData = new ArrayList<EventHolder>();
-        this.dCH = new EventCacher(context);
     }
 
     /**
@@ -77,15 +69,11 @@ public class EventAdapter extends BaseAdapter
      * @param type
      * @param typeID
      */
-    public void add(String name, String type, String description, String waypoint, String imageFileName, int level, int eventID, int typeID)
+    public void add(String name, String description, String eventID, int typeID)
     {
         EventHolder events = new EventHolder();
         events.name        = name;
-        events.type        = type;
         events.description = description;
-        events.waypoint    = waypoint;
-        events.imagePath   = imageFileName;
-        events.level       = level;
         events.typeID      = typeID;
         events.eventID     = eventID;
 
@@ -113,11 +101,8 @@ public class EventAdapter extends BaseAdapter
             holder = new ViewHolder();
             holder.eventNameTV      = (TextView)convertView.findViewById(R.id.eventAdapterTitleTextView);
             holder.eventDescTV      = (TextView)convertView.findViewById(R.id.eventAdapterDescriptionTextView);
-            holder.eventWaypointTV  = (TextView)convertView.findViewById(R.id.eventAdapterWaypointTextView);
-            holder.eventLevelTV     = (TextView)convertView.findViewById(R.id.eventAdapterLevelTextView);
             holder.eventTypeIV      = (ImageView)convertView.findViewById(R.id.eventAdapterLeftImageView);
             holder.eventExtraInfoRL = (RelativeLayout)convertView.findViewById(R.id.eventAdapterExtraInfoLayout);
-            holder.eventImageIV     = (ImageView)convertView.findViewById(R.id.eventAdapterImageImageView);
             convertView.setTag(holder);
         } else
         {
@@ -127,8 +112,6 @@ public class EventAdapter extends BaseAdapter
         EventHolder tempEvent = getItem(position);
         holder.eventNameTV.setText(tempEvent.name);
         holder.eventDescTV.setText(tempEvent.description);
-        holder.eventLevelTV.setText(tempEvent.level + "");
-        holder.eventWaypointTV.setText(tempEvent.waypoint);
         
 
         //Determine which color to add to the eventClass left bar thing
@@ -170,11 +153,9 @@ public class EventAdapter extends BaseAdapter
             
             //Get image
             if (tempEvent.image == null) {
-            	File tempFile = new File(this.dCH.getMediaCachePath() + EventCacher.EVENTS_CACHE_DIR, tempEvent.imagePath);
-            	tempEvent.image = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+            	//File tempFile = new File(this.dCH.getMediaCachePath() + EventCacher.EVENTS_CACHE_DIR, tempEvent.imagePath);
+            	//tempEvent.image = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
             }
-            
-            holder.eventImageIV.setImageDrawable(tempEvent.image);
         }
         else
         {
@@ -183,7 +164,6 @@ public class EventAdapter extends BaseAdapter
         	holder.eventNameTV.setBackgroundResource(eventBGPressed);
             holder.eventNameTV.setTextColor(context.getResources().getColor(R.color.black));
             holder.eventNameTV.setActivated(false);
-            holder.eventImageIV.setImageDrawable(null);
         }
         
 

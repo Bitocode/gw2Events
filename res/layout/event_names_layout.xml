@@ -8,10 +8,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/apiView_relativeContainer" >
+        android:id="@+id/eventNamesView_relativeContainer" >
 		
         <ImageView
-            android:id="@+id/apiView_gw2HeaderImageView"
+            android:id="@+id/eventNamesView_gw2HeaderImageView"
             android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -20,7 +20,7 @@
             android:src="@drawable/gw2_header3" />
 
         <ImageView
-            android:id="@+id/apiView_gw2LogoImageView"
+            android:id="@+id/eventNamesView_gw2LogoImageView"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -29,7 +29,7 @@
             android:src="@drawable/gw2logo_transparent" />
         
         <TextView
-            android:id="@+id/apiView_resultTextView"
+            android:id="@+id/eventNamesView_logoTextView"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center|right"
@@ -44,10 +44,10 @@
     </RelativeLayout>
 
     <ListView
-        android:id="@+id/apiView_eventListView"
+        android:id="@+id/eventNamesView_eventListView"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/apiView_relativeContainer"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/eventNamesView_relativeContainer"
         android:divider="@null"
         android:listSelector="@android:color/transparent" />
 
