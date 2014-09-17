@@ -41,6 +41,34 @@
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold" />
+        
     </RelativeLayout>
-
+    
+    <ImageView 
+        android:id="@+id/eventDetailsView_eventImageView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="25dp"
+        android:paddingBottom="25dp"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:layout_below="@id/eventDetailsView_relativeContainer" />
+    
+    <TextView
+        android:id="@+id/eventDetailsView_descriptionTextView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center|right"
+        android:layout_marginRight="5dp"
+        android:shadowColor="#000"
+        android:shadowDx="2"
+        android:shadowDy="-2"
+        android:shadowRadius="0.2"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_below="@id/eventDetailsView_relativeContainer" />
+    
 </RelativeLayout>

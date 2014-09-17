@@ -72,7 +72,7 @@ public class WorldView extends Activity
 		euServerID		= new HashMap<String, Integer>();
 		
 		//Preferences
-		sharedPrefs 		= getSharedPreferences(EventHolder.PREFS_NAME, 0);
+		sharedPrefs 		= getSharedPreferences(EventCacher.PREFS_NAME, 0);
 		sharedPrefsEditor 	= sharedPrefs.edit();
 	
         //Initialize the spinner
@@ -113,13 +113,13 @@ public class WorldView extends Activity
 			
 			if(region == "North America"){
 				if(adapterNA.isEmpty()){
-					new ServerSelectAPI().execute();
+					new ServerSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				} else {
 					lvServer.setAdapter(adapterNA);
 				}
 			} else if (region == "Europe"){
 				if(adapterEU.isEmpty()){
-					new ServerSelectAPI().execute();
+					new ServerSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				} else {
 					lvServer.setAdapter(adapterEU);
 				}
@@ -166,8 +166,8 @@ public class WorldView extends Activity
 				selectedServerID = euServerID.get(selectedServer);
 			}
 			
-			sharedPrefsEditor.putInt(EventHolder.PREFS_SERVER_ID, selectedServerID);
-			sharedPrefsEditor.putString(EventHolder.PREFS_SERVER_NAME, selectedServer);
+			sharedPrefsEditor.putInt(EventCacher.PREFS_SERVER_ID, selectedServerID);
+			sharedPrefsEditor.putString(EventCacher.PREFS_SERVER_NAME, selectedServer);
 			sharedPrefsEditor.apply();
 			
 			Toast.makeText(context, "Server ID Saved", Toast.LENGTH_LONG).show();
