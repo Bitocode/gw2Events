@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLDecoder;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,6 +31,7 @@ public class EventDetailsView extends Activity
 {
 	protected TextView logoTextView;
 	protected TextView descriptionTextView;
+	protected TextView startTimesTextView;
 	protected ImageView eventImageView;
 	
 	protected EventHolder eventHolder;
@@ -56,6 +59,7 @@ public class EventDetailsView extends Activity
 		
 		logoTextView        = (TextView)findViewById(R.id.eventDetailsView_logoTextView);
 		descriptionTextView = (TextView)findViewById(R.id.eventDetailsView_descriptionTextView);
+		startTimesTextView  = (TextView)findViewById(R.id.eventDetailsView_startTimesTextView);
 		eventImageView      = (ImageView)findViewById(R.id.eventDetailsView_eventImageView);
 		
 		parseCache();
@@ -105,6 +109,17 @@ public class EventDetailsView extends Activity
 	        	logoTextView.setText(eventHolder.name);
 	        	descriptionTextView.setText(eventHolder.description);
 	        	eventImageView.setImageDrawable(eventHolder.image);
+	        	
+	        	JSONArray timeArray = eventObject.getJSONArray("start_times");
+	        	
+	        	//SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	        	
+	        	eventHolder.startTimes = new Time[timeArray.length()];
+	        	
+	        	for (int i = 0; i < timeArray.length(); i++)
+	        	{
+	        		//eventHolder.startTimes[i] = timeArray.get(i);
+	        	}
 	        }
 	        catch (JSONException e)
 	        {

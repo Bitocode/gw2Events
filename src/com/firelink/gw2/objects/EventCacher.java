@@ -79,7 +79,7 @@ public class EventCacher
 			return;
 		}
 		
-		new CacheMediaTask().execute(source, path, fileName);
+		new CacheMediaTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, source, path, fileName);
 	}
 	
 	/**

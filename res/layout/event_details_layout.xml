@@ -60,15 +60,30 @@
         android:id="@+id/eventDetailsView_descriptionTextView"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:gravity="center|right"
+        android:gravity="center"
         android:layout_marginRight="5dp"
-        android:shadowColor="#000"
+        android:shadowColor="#FFF"
         android:shadowDx="2"
         android:shadowDy="-2"
         android:shadowRadius="0.2"
-        android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textColor="@color/black"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_below="@id/eventDetailsView_relativeContainer" />
+        android:layout_below="@id/eventDetailsView_eventImageView" />
+    
+    <TextView
+        android:id="@+id/eventDetailsView_startTimesTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginRight="5dp"
+        android:shadowColor="#FFF"
+        android:shadowDx="2"
+        android:shadowDy="-2"
+        android:shadowRadius="0.2"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_below="@id/eventDetailsView_descriptionTextView" />
     
 </RelativeLayout>
