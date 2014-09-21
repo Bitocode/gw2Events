@@ -1,7 +1,8 @@
 package com.firelink.gw2.objects;
 
+import java.util.Date;
+
 import android.graphics.drawable.BitmapDrawable;
-import android.text.format.Time;
 
 
 public class EventHolder
@@ -13,7 +14,7 @@ public class EventHolder
     public String description;
     public String waypoint;
     public String imageName;
-    public Time[] startTimes;
+    public Date[] startTimes;
     public BitmapDrawable image;
     public int level;
     public int typeID;

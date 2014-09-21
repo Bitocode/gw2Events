@@ -50,7 +50,7 @@ public class EventNamesView extends Activity
         activity = this;
         context  = this;
 
-        logoTextView = (TextView)findViewById(R.id.eventNamesView_logoTextView);
+        logoTextView = (TextView)findViewById(R.id.menuBar_logoTextView);
         eventListView  = (ListView)findViewById(R.id.eventNamesView_eventListView);
         eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         eventListView.setOnItemClickListener(eventSelectAdapterView);
@@ -126,6 +126,7 @@ public class EventNamesView extends Activity
             Intent intent = new Intent(activity, EventDetailsView.class);
             intent.putExtras(bundle);
             startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
     };
     

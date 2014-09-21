@@ -6,6 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +23,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.format.Time;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -57,7 +61,7 @@ public class EventDetailsView extends Activity
 		
 		eventHolder.eventID = bundle.getString("eventID");
 		
-		logoTextView        = (TextView)findViewById(R.id.eventDetailsView_logoTextView);
+		logoTextView        = (TextView)findViewById(R.id.menuBar_logoTextView);
 		descriptionTextView = (TextView)findViewById(R.id.eventDetailsView_descriptionTextView);
 		startTimesTextView  = (TextView)findViewById(R.id.eventDetailsView_startTimesTextView);
 		eventImageView      = (ImageView)findViewById(R.id.eventDetailsView_eventImageView);
@@ -65,6 +69,15 @@ public class EventDetailsView extends Activity
 		parseCache();
 		
 		//new EventDetailsAPI().execute();
+	}
+	
+	@Override
+	public void onBackPressed() 
+	{
+		super.onBackPressed();
+		
+		finish();
+		overridePendingTransition(0, android.R.anim.fade_out);
 	}
 	
 	private void parseCache()
@@ -107,24 +120,42 @@ public class EventDetailsView extends Activity
 	        	eventHolder.image      = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
 	        	
 	        	logoTextView.setText(eventHolder.name);
-	        	descriptionTextView.setText(eventHolder.description);
 	        	eventImageView.setImageDrawable(eventHolder.image);
+	        	descriptionTextView.setText(eventHolder.description);
 	        	
 	        	JSONArray timeArray = eventObject.getJSONArray("start_times");
 	        	
-	        	//SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	        	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
+	        	TimeZone utcTZ   = TimeZone.getTimeZone("UTC");
+	        	TimeZone localTZ = TimeZone.getDefault();
 	        	
-	        	eventHolder.startTimes = new Time[timeArray.length()];
-	        	
+	        	eventHolder.startTimes = new Date[timeArray.length()];
+	        	String startTimes = "";
 	        	for (int i = 0; i < timeArray.length(); i++)
 	        	{
-	        		//eventHolder.startTimes[i] = timeArray.get(i);
+	        		//Parse UTC times
+	        		sdf.setTimeZone(utcTZ);
+	        		eventHolder.startTimes[i] = sdf.parse(timeArray.getString(i));
+	        		//Change to local timezone somewhere
+	        		sdf.setTimeZone(localTZ);
+	        		//Add offset from DST, if there is one
+	        		eventHolder.startTimes[i] = sdf.parse(sdf.format(eventHolder.startTimes[i]) + 
+	        				((localTZ.inDaylightTime(new Date()) ? localTZ.getDSTSavings() : 0) / 1000));
+	        		
+	        		//Print it
+	        		startTimes = startTimes.concat(sdf.format(eventHolder.startTimes[i]) + "\n");
+
+	        		Log.d("GW2Events", i + ": " + sdf.format(eventHolder.startTimes[i]));
 	        	}
+	        	
+	        	startTimesTextView.setText(startTimes);
 	        }
 	        catch (JSONException e)
 	        {
 	            Log.d("GW2Events", e.getMessage() + ": " + json);
-	        }
+	        } catch (ParseException e) {
+	        	Log.d("GW2Events", e.getMessage());
+			}
 		}
 	}
 	

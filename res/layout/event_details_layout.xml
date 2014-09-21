@@ -1,89 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal" >
+    android:layout_height="wrap_content" >
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/eventDetailsView_relativeContainer" >
-		
-        <ImageView
-            android:id="@+id/eventDetailsView_gw2HeaderImageView"
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:contentDescription="@string/just_a_logo"
-            android:scaleType="fitXY"
-            android:src="@drawable/gw2_header3" />
+        android:orientation="horizontal" >
+
+        <include 
+            layout="@layout/menu_bar"
+            android:id="@+id/eventDetailsView_relativeContainer"
+        />
 
         <ImageView
-            android:id="@+id/eventDetailsView_gw2LogoImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:contentDescription="@string/just_a_logo"
-            android:scaleType="fitStart"
-            android:src="@drawable/gw2logo_transparent" />
-        
+            android:id="@+id/eventDetailsView_eventImageView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_relativeContainer"
+            android:adjustViewBounds="true"
+            android:paddingBottom="5dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/the_specific_event_image" />
+
         <TextView
-            android:id="@+id/eventDetailsView_logoTextView"
+            android:id="@+id/eventDetailsView_descriptionTextView"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center|right"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_eventImageView"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:shadowColor="#000"
+            android:gravity="center"
+            android:shadowColor="#FFF"
             android:shadowDx="2"
             android:shadowDy="-2"
             android:shadowRadius="0.2"
-            android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
             android:textStyle="bold" />
-        
+
+        <TextView
+            android:id="@+id/eventDetailsView_startTimesTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_descriptionTextView"
+            android:layout_marginRight="5dp"
+            android:gravity="center"
+            android:shadowColor="#FFF"
+            android:shadowDx="2"
+            android:shadowDy="-2"
+            android:shadowRadius="0.2"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </RelativeLayout>
-    
-    <ImageView 
-        android:id="@+id/eventDetailsView_eventImageView"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:paddingLeft="5dp"
-        android:paddingTop="25dp"
-        android:paddingBottom="25dp"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-        android:layout_below="@id/eventDetailsView_relativeContainer" />
-    
-    <TextView
-        android:id="@+id/eventDetailsView_descriptionTextView"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:layout_marginRight="5dp"
-        android:shadowColor="#FFF"
-        android:shadowDx="2"
-        android:shadowDy="-2"
-        android:shadowRadius="0.2"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_below="@id/eventDetailsView_eventImageView" />
-    
-    <TextView
-        android:id="@+id/eventDetailsView_startTimesTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginRight="5dp"
-        android:shadowColor="#FFF"
-        android:shadowDx="2"
-        android:shadowDy="-2"
-        android:shadowRadius="0.2"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_below="@id/eventDetailsView_descriptionTextView" />
-    
-</RelativeLayout>
+
+</ScrollView>
