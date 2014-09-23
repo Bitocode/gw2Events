@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -66,18 +67,34 @@ public class EventDetailsView extends Activity
 		startTimesTextView  = (TextView)findViewById(R.id.eventDetailsView_startTimesTextView);
 		eventImageView      = (ImageView)findViewById(R.id.eventDetailsView_eventImageView);
 		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		parseCache();
 		
 		//new EventDetailsAPI().execute();
 	}
 	
 	@Override
-	public void onBackPressed() 
+	protected void onStart() 
+	{
+		super.onStart();
+		
+		getActionBar().setTitle("Event Details");
+		getActionBar().setSubtitle(eventHolder.name);
+	}
+	
+	@Override
+	protected void onPause() 
+	{
+		super.onPause();
+		overridePendingTransition(0, android.R.anim.fade_out);
+	}
+	
+	@Override
+	public boolean onNavigateUp() 
 	{
 		super.onBackPressed();
-		
-		finish();
-		overridePendingTransition(0, android.R.anim.fade_out);
+		return true;
 	}
 	
 	private void parseCache()
@@ -111,14 +128,13 @@ public class EventDetailsView extends Activity
 	        {
 	        	JSONObject eventObject = new JSONObject(json);
 	            
-	        	eventHolder.description = URLDecoder.decode(eventObject.getString("description"));
-	            eventHolder.imageName   = URLDecoder.decode(eventObject.getString("imageFileName"));
-	            eventHolder.name        = URLDecoder.decode(eventObject.getString("name"));
+	        	eventHolder.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
+	            eventHolder.imageName   = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
+	            eventHolder.name        = URLDecoder.decode(eventObject.getString("name"), "UTF-8");
 	            
 	            EventCacher tempCacher = new EventCacher(context);
 	    		File tempFile          = new File(tempCacher.getCachePath() + EventCacher.CACHE_MEDIA_DIR, eventHolder.imageName);
-	        	eventHolder.image      = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
-	        	
+	        	eventHolder.image      = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
 	        	logoTextView.setText(eventHolder.name);
 	        	eventImageView.setImageDrawable(eventHolder.image);
 	        	descriptionTextView.setText(eventHolder.description);
@@ -155,6 +171,8 @@ public class EventDetailsView extends Activity
 	            Log.d("GW2Events", e.getMessage() + ": " + json);
 	        } catch (ParseException e) {
 	        	Log.d("GW2Events", e.getMessage());
+			} catch (UnsupportedEncodingException e) {
+				Log.d("GW2Events", e.getMessage());
 			}
 		}
 	}
@@ -199,17 +217,19 @@ public class EventDetailsView extends Activity
             	JSONObject eventObject = new JSONObject(result);
             	eventObject = eventObject.getJSONObject("events").getJSONObject(eventHolder.eventID);
                 
-            	eventHolder.description = URLDecoder.decode(eventObject.getString("description"));
-                eventHolder.imageName = URLDecoder.decode(eventObject.getString("imageFileName"));
+            	eventHolder.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
+                eventHolder.imageName = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
                 
                 EventCacher tempCacher = new EventCacher(context);
         		File tempFile = new File(tempCacher.getCachePath() + EventCacher.CACHE_MEDIA_DIR, eventHolder.imageName);
-            	eventHolder.image = new BitmapDrawable(BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+            	eventHolder.image = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
             }
             catch (JSONException e)
             {
                 Log.d("GW2Events", e.getMessage());
-            }
+            } catch (UnsupportedEncodingException e) {
+				Log.d("GW2Events", e.getMessage());
+			}
 
             return result;
         }

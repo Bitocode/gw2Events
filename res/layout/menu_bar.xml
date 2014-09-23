@@ -3,6 +3,7 @@
     android:id="@+id/eventDetailsView_relativeContainer"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:visibility="gone"
     android:orientation="vertical" >
     
     <LinearLayout 

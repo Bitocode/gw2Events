@@ -1,5 +1,6 @@
 package com.firelink.gw2.events;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -230,7 +231,7 @@ public class WorldView extends Activity
 				for (int i = 0; i < eventNameJSONArray.length(); i++) {
 					JSONObject jsonObject = eventNameJSONArray.getJSONObject(i);
 					String eventID = jsonObject.getString("id");
-					String eventName = URLDecoder.decode(jsonObject.getString("name"));
+					String eventName = URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
 					
 					eventNameCV.put("eventID", eventID);
 					eventNameCV.put("eventName", eventName);
@@ -271,8 +272,9 @@ public class WorldView extends Activity
 					Log.d("GW2Events", "mapID: " + sqlCursor.getString(0) + ", mapName: " + sqlCursor.getString(1));
 				}
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.d("GW2Events", e.getMessage());
+			} catch (UnsupportedEncodingException e) {
+				Log.d("GW2Events", e.getMessage());
 			}
 			
 			return true;
@@ -333,7 +335,7 @@ public class WorldView extends Activity
 				
 				for(int i = 0; i < json.length(); i++){
 					JSONObject jsonObject 	= json.getJSONObject(i);
-					String key 				= URLDecoder.decode(jsonObject.getString("name"));
+					String key 				= URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
 					int value 				= jsonObject.getInt("id");
 					
 					
@@ -352,6 +354,8 @@ public class WorldView extends Activity
 			}
 			catch (JSONException e)
 			{
+				Log.d("GW2Events", e.getMessage());
+			} catch (UnsupportedEncodingException e) {
 				Log.d("GW2Events", e.getMessage());
 			}
 			

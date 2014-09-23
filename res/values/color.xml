@@ -16,6 +16,7 @@
 	<color name="blue">#0000FF</color>
 	<color name="navy">#000080</color>
 	<color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
 	<color name="gw_red">#DC241F</color>
 	<color name="gw_red_lighter">#FF574F</color>
     <color name="gw_event_level_high">#DC2627</color>

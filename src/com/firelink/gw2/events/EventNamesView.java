@@ -1,5 +1,6 @@
 package com.firelink.gw2.events;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Iterator;
 
@@ -7,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -35,6 +37,7 @@ public class EventNamesView extends Activity
     protected TextView logoTextView;
     protected ListView eventListView;
     protected ProgressDialog eventProgDialog;
+    protected ActionBar actionBar;
 
     protected int serverID;
     protected String serverName;
@@ -55,6 +58,8 @@ public class EventNamesView extends Activity
         eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         eventListView.setOnItemClickListener(eventSelectAdapterView);
 
+        actionBar = getActionBar();
+        
         SharedPreferences sharedPrefs = getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
         serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
@@ -110,6 +115,8 @@ public class EventNamesView extends Activity
     private void setServerName()
     {
         logoTextView.setText(serverName);
+        actionBar.setTitle("All Events");
+        actionBar.setSubtitle(serverName);
     }
 
     AdapterView.OnItemClickListener eventSelectAdapterView = new AdapterView.OnItemClickListener()
@@ -238,9 +245,9 @@ public class EventNamesView extends Activity
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
 
-                    String name 		 = URLDecoder.decode(jsonObject.getString("short_name"));
-                    String description   = URLDecoder.decode(jsonObject.getString("name"));
-                    String eventID       = URLDecoder.decode(jsonObject.getString("id"));
+                    String name 		 = URLDecoder.decode(jsonObject.getString("short_name"), "UTF-8");
+                    String description   = URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
+                    String eventID       = URLDecoder.decode(jsonObject.getString("id"), "UTF-8");
                     int typeID           = jsonObject.getInt("event_class_id");
 
                     //Add to adapter at some point
@@ -251,8 +258,10 @@ public class EventNamesView extends Activity
             }
             catch (JSONException e)
             {
-                Log.d("GW2Events", e.getMessage());
-            }
+            	Log.d("GW2Events", e.getMessage());
+            } catch (UnsupportedEncodingException e) {
+            	Log.d("GW2Events", e.getMessage());
+			}
 
             //Reset adapter
             eventListView.setAdapter(null);
