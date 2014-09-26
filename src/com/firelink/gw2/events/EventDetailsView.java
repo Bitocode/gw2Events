@@ -52,6 +52,10 @@ public class EventDetailsView extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.event_details_layout);
 		
+		//Set actionbar stuff
+		getActionBar().setDisplayShowTitleEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		activity = this;
 		context  = this;
 		
@@ -66,8 +70,6 @@ public class EventDetailsView extends Activity
 		descriptionTextView = (TextView)findViewById(R.id.eventDetailsView_descriptionTextView);
 		startTimesTextView  = (TextView)findViewById(R.id.eventDetailsView_startTimesTextView);
 		eventImageView      = (ImageView)findViewById(R.id.eventDetailsView_eventImageView);
-		
-		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		parseCache();
 		

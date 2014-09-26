@@ -30,8 +30,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firelink.gw2.objects.*;
-import com.firelink.gw2.events.R;
+import com.firelink.gw2.objects.APICaller;
+import com.firelink.gw2.objects.EventCacher;
+import com.firelink.gw2.objects.SQLHelper;
 
 public class WorldView extends Activity
 {	
@@ -57,15 +58,17 @@ public class WorldView extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.world_view_layout);
         
-		//Cache our background data
-		//new cacheData().execute();
+		//Set actionbar stuff
+        getActionBar().setTitle("Select World");
+        getActionBar().setDisplayShowTitleEnabled(true);
 		
         //Initialize globals
         selectedServer = "";
         
         context 	= this;
         activity 	= this;
-             
+    
+        
         lvServer 		= (ListView)findViewById(R.id.worldView_serverListView);
 		adapterNA	 	= new ArrayAdapter<String>(this, R.layout.world_view_serverlist_textview);
 		adapterEU	 	= new ArrayAdapter<String>(this, R.layout.world_view_serverlist_textview);

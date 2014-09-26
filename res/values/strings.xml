@@ -3,6 +3,7 @@
 
     <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">GW2EventTimers</string>
+    <string name="app_label">Guild Wars 2 Event Timer</string>
     <string name="please_select_your_default_server_you_can_always_change_this_later_in_the_settings_">Please select your default server. You can always change this later in the settings.</string>
     <string name="select_a_region">Select a region</string>
     <string name="select_a_server">Select a server</string>

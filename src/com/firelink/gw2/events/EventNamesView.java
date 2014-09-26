@@ -49,7 +49,11 @@ public class EventNamesView extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_names_layout);
-
+        
+        //Set actionbar stuff
+        actionBar = getActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        
         activity = this;
         context  = this;
 
@@ -57,8 +61,6 @@ public class EventNamesView extends Activity
         eventListView  = (ListView)findViewById(R.id.eventNamesView_eventListView);
         eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         eventListView.setOnItemClickListener(eventSelectAdapterView);
-
-        actionBar = getActionBar();
         
         SharedPreferences sharedPrefs = getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
