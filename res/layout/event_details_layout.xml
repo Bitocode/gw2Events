@@ -8,16 +8,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <include 
-            layout="@layout/menu_bar"
-            android:id="@+id/eventDetailsView_relativeContainer"
-        />
-
         <ImageView
             android:id="@+id/eventDetailsView_eventImageView"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/eventDetailsView_relativeContainer"
             android:adjustViewBounds="true"
             android:paddingBottom="5dp"
             android:paddingLeft="0dp"

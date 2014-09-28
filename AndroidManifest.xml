@@ -17,7 +17,7 @@
         android:allowBackup="true">
         <activity
             android:label="@string/app_label"
-            android:name="com.firelink.gw2.events.EventNamesView" >
+            android:name="com.firelink.gw2.events.HomeLayout" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -33,6 +33,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.firelink.gw2.events.EventNamesView" />
         </activity>
+        <activity
+            android:name="com.firelink.gw2.events.EventNamesView" />
     </application>
 
 </manifest>

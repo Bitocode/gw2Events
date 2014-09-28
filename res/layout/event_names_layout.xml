@@ -4,16 +4,10 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal" >
 
-    <include 
-            layout="@layout/menu_bar"
-            android:id="@+id/eventNamesView_relativeContainer"
-        />
-
     <ListView
         android:id="@+id/eventNamesView_eventListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/eventNamesView_relativeContainer"
         android:divider="@null"
         android:listSelector="@android:color/transparent" />
 
