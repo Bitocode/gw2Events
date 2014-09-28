@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
@@ -29,6 +30,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,6 +42,9 @@ import com.firelink.gw2.objects.EventHolder;
 
 public class EventDetailsFragment extends Fragment 
 {
+	private SharedPreferences sharedPrefs;
+	private SharedPreferences.Editor sharedPrefsEditor;
+	
 	protected TextView descriptionTextView;
 	protected TextView startTimesTextView;
 	protected ImageView eventImageView;
@@ -61,6 +66,10 @@ public class EventDetailsFragment extends Fragment
 		super.onCreate(savedInstanceState);
 		
 		setHasOptionsMenu(true);
+		
+		sharedPrefs 		= getActivity().getSharedPreferences(EventCacher.PREFS_NAME, 0);
+		sharedPrefsEditor 	= sharedPrefs.edit();
+		sharedPrefsEditor.commit();
 	}
 	
 	/**
@@ -121,6 +130,62 @@ public class EventDetailsFragment extends Fragment
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) 
 	{
 		inflater.inflate(R.menu.event_details_actions, menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+		switch (item.getItemId()) {
+			case R.id.eventDetails_action_subscribe:
+				toggleSubscribe();
+				setSubscribeIcon(item);
+				break;
+		}
+		
+		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) 
+	{
+		super.onPrepareOptionsMenu(menu);
+		
+		for (int i = 0; i < menu.size(); i++) {
+			MenuItem item = menu.getItem(i);
+			if (item.getItemId() == R.id.eventDetails_action_subscribe) {
+				setSubscribeIcon(item);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param item
+	 */
+	private void toggleSubscribe()
+	{
+		//Get list of subscribed users
+		int isSub = sharedPrefs.getInt(eventHolder.eventID, 0);
+		
+		if (isSub == 1) {
+			sharedPrefsEditor.putInt(eventHolder.eventID, 0);
+		} else {
+			sharedPrefsEditor.putInt(eventHolder.eventID, 1);
+		}
+		
+		sharedPrefsEditor.apply();
+	}
+	
+	private void setSubscribeIcon(MenuItem item)
+	{
+		//Get list of subscribed users
+		int isSub = sharedPrefs.getInt(eventHolder.eventID, 0);
+		
+		if (isSub == 1) {
+			item.setIcon(getResources().getDrawable(R.drawable.ic_action_important));
+		} else {
+			item.setIcon(getResources().getDrawable(R.drawable.ic_action_not_important));
+		}
 	}
 	
 	/**
