@@ -11,13 +11,9 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +28,6 @@ import android.widget.Toast;
 
 import com.firelink.gw2.objects.APICaller;
 import com.firelink.gw2.objects.EventCacher;
-import com.firelink.gw2.objects.SQLHelper;
 
 public class WorldView extends Activity
 {	
@@ -185,105 +180,7 @@ public class WorldView extends Activity
 		}
 	};
 
-	/**
-	 * This caches our background data that we might use in the future
-	 */
-	public class cacheData extends AsyncTask<Void, Void, Boolean>
-	{
-		@Override
-		protected Boolean doInBackground(Void... params) {
-			
-			//TODO: Cache the map names, map tiles, map information, and anything else I can think of
-			
-			final String TABLE_NAME_EVENT 	= "tblEventName";
-			final String TABLE_NAME_MAP 	= "tblMapName";
-
-			//Create our database tables
-			String[] initialQueries = new String[2];
-			initialQueries[0]	= "CREATE TABLE " + TABLE_NAME_EVENT + " ( eventID VARCHAR(255) PRIMARY KEY, eventName VARCHAR(255) ) ";
-			initialQueries[1]	= "CREATE TABLE " + TABLE_NAME_MAP + " ( mapID INTEGER PRIMARY KEY, mapName VARCHAR(255) )";
-			
-			SQLHelper sqlHelper	= new SQLHelper(getApplicationContext(), initialQueries);
-			
-			//Retrieve database handlers
-			SQLiteDatabase sqlWrite	= sqlHelper.getWritableDatabase();
-			SQLiteDatabase sqlRead	= sqlHelper.getReadableDatabase();
-			
-			//Get our event name API data
-			APICaller eventNameAPI = new APICaller();
-			eventNameAPI.setAPI(APICaller.API_EVENT_NAMES);
-			eventNameAPI.callAPI();
-			String eventNameJSON = eventNameAPI.getJSONString();
-			
-			//Get our map name API data
-			APICaller mapNameAPI = new APICaller();
-			mapNameAPI.setAPI(APICaller.API_MAP_NAMES);
-			mapNameAPI.callAPI();
-			String mapNameJSON = mapNameAPI.getJSONString();
-			
-			//Process the data and add it to our DB
-			try {
-				//Set our JSON arrays
-				JSONArray eventNameJSONArray 	= new JSONArray(eventNameJSON);
-				JSONArray mapNameJSONArray 		= new JSONArray(mapNameJSON);
-				
-				long rowID = 0;
-				ContentValues eventNameCV 	= new ContentValues();
-				ContentValues mapNameCV 	= new ContentValues();
-				
-				for (int i = 0; i < eventNameJSONArray.length(); i++) {
-					JSONObject jsonObject = eventNameJSONArray.getJSONObject(i);
-					String eventID = jsonObject.getString("id");
-					String eventName = URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
-					
-					eventNameCV.put("eventID", eventID);
-					eventNameCV.put("eventName", eventName);
-					
-					try {
-						rowID = sqlWrite.insertWithOnConflict(TABLE_NAME_EVENT, null, eventNameCV, SQLiteDatabase.CONFLICT_IGNORE);
-					} catch (SQLException e) {
-						Log.e("GW2Events", e.getMessage());
-					}
-				}
-			
-				Log.d("GW2Events", TABLE_NAME_EVENT + ": RowID - " + rowID);
-				
-				rowID = 0;
-				
-				for (int i = 0; i < mapNameJSONArray.length(); i++) {
-					JSONObject jsonObject = mapNameJSONArray.getJSONObject(i);
-					int mapID = jsonObject.getInt("id");
-					String mapName = jsonObject.getString("name");
-					
-					mapNameCV.put("mapID", mapID);
-					mapNameCV.put("mapName", mapName);
-					
-					try {
-						rowID = sqlWrite.insertWithOnConflict(TABLE_NAME_MAP, null, mapNameCV, SQLiteDatabase.CONFLICT_IGNORE);
-					} catch (SQLException e) {
-						Log.e("GW2Events", e.getMessage());
-					}
-					
-				}
-				
-				Log.d("GW2Events", TABLE_NAME_MAP + ": RowID - " + rowID);
-				
-				//Now try and retrieve
-				Cursor sqlCursor = sqlRead.query(TABLE_NAME_MAP, null, null, null, null, null, null);
-				
-				while (sqlCursor.moveToNext()) {
-					Log.d("GW2Events", "mapID: " + sqlCursor.getString(0) + ", mapName: " + sqlCursor.getString(1));
-				}
-			} catch (JSONException e) {
-				Log.d("GW2Events", e.getMessage());
-			} catch (UnsupportedEncodingException e) {
-				Log.d("GW2Events", e.getMessage());
-			}
-			
-			return true;
-		}	
-	}
-	
+		
 	/**
 	 * This is the class for making our API call to retrieve the server contents.
 	 */

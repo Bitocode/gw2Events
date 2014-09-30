@@ -37,13 +37,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.firelink.gw2.objects.APICaller;
+import com.firelink.gw2.objects.ChildFragmentInterface;
 import com.firelink.gw2.objects.EventCacher;
 import com.firelink.gw2.objects.EventHolder;
 
-public class EventDetailsFragment extends Fragment 
+public class EventDetailsFragment extends Fragment
 {
 	private SharedPreferences sharedPrefs;
 	private SharedPreferences.Editor sharedPrefsEditor;
+	private ChildFragmentInterface childFragInto;
 	
 	protected TextView descriptionTextView;
 	protected TextView startTimesTextView;
@@ -57,6 +59,18 @@ public class EventDetailsFragment extends Fragment
 	
 	public EventDetailsFragment(){}
 	
+	
+	@Override
+	public void onAttach(Activity activity) 
+	{
+		super.onAttach(activity);
+		
+		try {
+			childFragInto = (ChildFragmentInterface) activity;
+		} catch (ClassCastException e) {
+			
+		}
+	}
 	/**
 	 * 
 	 */
@@ -69,7 +83,7 @@ public class EventDetailsFragment extends Fragment
 		
 		sharedPrefs 		= getActivity().getSharedPreferences(EventCacher.PREFS_NAME, 0);
 		sharedPrefsEditor 	= sharedPrefs.edit();
-		sharedPrefsEditor.commit();
+		sharedPrefsEditor.commit();		
 	}
 	
 	/**
@@ -124,6 +138,14 @@ public class EventDetailsFragment extends Fragment
 	{
 		super.onPause();
 		activity.overridePendingTransition(0, android.R.anim.fade_out);
+	}
+	
+	@Override
+	public void onDetach() 
+	{
+		super.onDetach();
+		//refreshInterface.refresh();
+		childFragInto.refreshOnUpdate();
 	}
 	
 	@Override

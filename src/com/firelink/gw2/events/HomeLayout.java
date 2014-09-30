@@ -16,13 +16,20 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class HomeLayout extends Activity 
+import com.firelink.gw2.objects.ChildFragmentInterface;
+import com.firelink.gw2.objects.RefreshInterface;
+
+public class HomeLayout extends Activity implements ChildFragmentInterface
 {
 	private String[] jEventViews;
 	private DrawerLayout jDrawerLayout;
 	private ListView jDrawerListView;
+	private Fragment parentFragment;
+	private Fragment childFragment;
 	public ActionBarDrawerToggle jDrawerToggle;
 	public ArrayList<Class<?>> jEventClasses;
+	
+	public RefreshInterface refresh;
 	
 	
 	/**
@@ -35,10 +42,11 @@ public class HomeLayout extends Activity
 		setContentView(R.layout.drawer_layout);
 		
 		//The "tabs"
-		jEventViews = new String[]{"Event Names", "Upcoming Events"};
+		jEventViews = new String[]{"Event Names", "Upcoming Events", "Subscribed Events"};
 		jEventClasses = new ArrayList<Class<?>>();
 		jEventClasses.add(EventNamesFragment.class);
 		jEventClasses.add(EventUpcomingFragment.class);
+		jEventClasses.add(EventSubscribedFragment.class);
 		
 		//Set our views
 		jDrawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
@@ -137,6 +145,16 @@ public class HomeLayout extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public void refreshOnUpdate() 
+	{
+		boolean refresh = ((RefreshInterface) getFragmentManager().findFragmentByTag(parentFragment.getClass().getName())).isRefreshOnOpen();
+		
+		if (refresh) {
+			((RefreshInterface) getFragmentManager().findFragmentByTag(parentFragment.getClass().getName())).refresh();
+		}
+	}
+	
 	/**
 	 * 
 	 * @author Justin
@@ -170,17 +188,15 @@ public class HomeLayout extends Activity
 	 * @param position
 	 */
 	private void selectItem(int position)
-	{
-		Fragment fragment;
-		
+	{	
 		try {
-			fragment = (Fragment) (jEventClasses.get(position)).newInstance();
+			parentFragment = (Fragment) (jEventClasses.get(position)).newInstance();
 			
 			FragmentManager fragmentManager = getFragmentManager();
-			if (!fragmentManager.popBackStackImmediate(fragment.getClass().getName(), FragmentManager.POP_BACK_STACK_INCLUSIVE)) {
+			if (!fragmentManager.popBackStackImmediate(parentFragment.getClass().getName(), FragmentManager.POP_BACK_STACK_INCLUSIVE)) {
 				//Erase all stack
 				fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-				fragmentManager.beginTransaction().replace(R.id.drawerLayout_mainLayout, fragment, fragment.getClass().getName()).commit();
+				fragmentManager.beginTransaction().replace(R.id.drawerLayout_mainLayout, parentFragment, parentFragment.getClass().getName()).commit();
 			}
 			
 			jDrawerListView.setItemChecked(position, true);
@@ -199,11 +215,13 @@ public class HomeLayout extends Activity
 	 * @param fragment
 	 * @param callingFragment
 	 */
-	public void selectDetailItem(Fragment fragment, Fragment callingFragment)
+	public void selectDetailItem(Fragment fragment)
 	{	
+		childFragment = fragment;
+		
 		FragmentTransaction tFrag = getFragmentManager().beginTransaction();
-        tFrag.replace(R.id.drawerLayout_mainLayout, fragment);
-        tFrag.addToBackStack(callingFragment.getClass().getName());
+		tFrag.replace(R.id.drawerLayout_mainLayout, childFragment, childFragment.getClass().getName());
+        tFrag.addToBackStack(parentFragment.getClass().getName());
         
         //Commit
         tFrag.commit();

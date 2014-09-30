@@ -9,6 +9,9 @@ import java.net.URLConnection;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -35,7 +38,7 @@ public class EventCacher
 	public static final String CACHE_APIS_DIR  = "apis";
 	
 	private Context context;
-	final private String cachePath;
+	private String cachePath;
 	
 	public HashMap<String, BitmapDrawable> images;
 	
@@ -50,10 +53,15 @@ public class EventCacher
 		images = new HashMap<String, BitmapDrawable>();
 		
 		//Check if media is mounted
-    	cachePath =
-    			Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || 
-    				!Environment.isExternalStorageRemovable() ? this.context.getExternalCacheDir().getPath() :
+		try {
+			cachePath = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || 
+    				!Environment.isExternalStorageRemovable() ? 
+    					this.context.getExternalCacheDir().getPath() :
     					this.context.getCacheDir().getPath();
+		} catch (Exception e) {
+			cachePath = this.context.getCacheDir().getPath();
+		}
+    	
 	}
 	
 	/**
@@ -63,6 +71,38 @@ public class EventCacher
 	public String getCachePath()
     {
     	return cachePath + File.separator;
+    }
+	
+	/**
+	 * 
+	 * @param forSub
+	 * @return
+	 */
+	public static EventAdapter getCachedEventNames(boolean forSub, Context context)
+    {
+		EventAdapter eventAdapter = new EventAdapter(context);
+    	SQLHelper sqlHelper = new SQLHelper(context);
+        SQLiteDatabase sqlRead = sqlHelper.getReadableDatabase();
+        
+		Cursor sqlCursor = sqlRead.query(SQLHelper.TABLE_NAME_EVENT, null, null, null, null, null, null);
+		
+		while (sqlCursor.moveToNext()) {
+			String name = sqlCursor.getString(sqlCursor.getColumnIndex("eventName"));
+			String eventID = sqlCursor.getString(sqlCursor.getColumnIndex("eventID"));
+			String description = sqlCursor.getString(sqlCursor.getColumnIndex("eventDescription"));
+			int typeID = sqlCursor.getInt(sqlCursor.getColumnIndex("typeID"));
+			
+			SharedPreferences sharedPrefs = context.getSharedPreferences(EventCacher.PREFS_NAME, 0);
+			int check = sharedPrefs.getInt(eventID, 0);
+			
+			if (1 == check || !forSub) {
+				eventAdapter.add(name, description, eventID, typeID);
+			}
+			
+			Log.d("GW2Events", "eventName:" + name + "; eventID:" + eventID + "; eventDescription:" + description + "; typeID:" + typeID);
+		}
+		
+		return eventAdapter;
     }
 	
 	/**
