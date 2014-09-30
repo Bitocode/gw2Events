@@ -148,7 +148,12 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 	@Override
 	public void refreshOnUpdate() 
 	{
-		boolean refresh = ((RefreshInterface) getFragmentManager().findFragmentByTag(parentFragment.getClass().getName())).isRefreshOnOpen();
+		boolean refresh = false;
+		
+		Fragment fragment = getFragmentManager().findFragmentByTag(parentFragment.getClass().getName());
+		if (fragment != null) {
+			refresh = ((RefreshInterface)fragment).isRefreshOnOpen();
+		}
 		
 		if (refresh) {
 			((RefreshInterface) getFragmentManager().findFragmentByTag(parentFragment.getClass().getName())).refresh();
