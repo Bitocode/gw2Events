@@ -11,11 +11,11 @@ import org.json.JSONObject;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +38,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
     protected Fragment fragment;
 
     protected ListView eventListView;
-    protected ProgressDialog eventProgDialog;
+    protected SwipeRefreshLayout refreshLayout;
     protected ActionBar actionBar;
 
     protected int serverID;
@@ -75,6 +75,15 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
         eventListView  = (ListView)view.findViewById(R.id.eventUpcomingView_eventListView);
         eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         eventListView.setOnItemClickListener(eventSelectAdapterView);
+        
+        refreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.eventUpcoming_refreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				refresh();
+			}
+		});
+        refreshLayout.setColorSchemeResources(R.color.gw_red, R.color.black, R.color.gw_event_level_standard, R.color.gw_event_level_high);
         
         initEventView();
     	
@@ -152,13 +161,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
         protected void onPreExecute()
         {
             super.onPreExecute();
-
-            eventProgDialog = new ProgressDialog(activity);
-            eventProgDialog.setMessage("Retrieving events...");
-            eventProgDialog.setIndeterminate(false);
-            eventProgDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            eventProgDialog.setCancelable(false);
-            eventProgDialog.show();
+            refreshLayout.setRefreshing(true);
         }
 
         @Override
@@ -213,7 +216,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
             eventListView.setAdapter(null);
             eventListView.setAdapter(eventAdapter);
 
-            eventProgDialog.dismiss();
+            refreshLayout.setRefreshing(false);
         }
     }
 }

@@ -62,7 +62,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) 
     {
-    	View view = inflater.inflate(R.layout.event_upcoming_layout, container, false);
+    	View view = inflater.inflate(R.layout.event_subscribed_layout, container, false);
 
         eventListView  = (ListView)view.findViewById(R.id.eventUpcomingView_eventListView);
         eventListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
