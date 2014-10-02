@@ -2,6 +2,7 @@ package com.firelink.gw2.events;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -166,8 +167,8 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
             String result = "";
             APICaller api = new APICaller();
 
-            api.setAPI(APICaller.API_EVENT_NAMES);
-            api.setLanguage(APICaller.LANG_ENGLISH);
+            api.setAPI(APICaller.API_EVENTS);
+            api.setWorld(serverID);
 
             if (api.callAPI()) {
                 result = api.getJSONString();
@@ -187,18 +188,16 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
             {
                 JSONArray json;
                 json = new JSONArray(result);
-                //EventCacher dCH = new EventCacher(context);
+                HashMap<String, EventHolder> tempMap = EventCacher.getCachedEventNames(context);
+                
 
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
-
-                    String name 		 = URLDecoder.decode(jsonObject.getString("short_name"), "UTF-8");
-                    String description   = URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
-                    String eventID       = URLDecoder.decode(jsonObject.getString("id"), "UTF-8");
+                    String eventID       = URLDecoder.decode(jsonObject.getString("event_id"), "UTF-8");
                     int typeID           = jsonObject.getInt("event_class_id");
 
                     //Add to adapter at some point
-                    eventAdapter.add(name, description, eventID, typeID);
+                    eventAdapter.add(tempMap.get(eventID).name, tempMap.get(eventID).description, eventID, typeID);
                     
                     //dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.EVENTS_CACHE_DIR, imageFileName);
                 }

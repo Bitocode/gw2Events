@@ -9,7 +9,6 @@ import java.net.URLConnection;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
@@ -78,9 +77,9 @@ public class EventCacher
 	 * @param forSub
 	 * @return
 	 */
-	public static EventAdapter getCachedEventNames(boolean forSub, Context context)
+	public static HashMap<String, EventHolder> getCachedEventNames(Context context)
     {
-		EventAdapter eventAdapter = new EventAdapter(context);
+		HashMap<String, EventHolder> events = new HashMap<String, EventHolder>();
     	SQLHelper sqlHelper = new SQLHelper(context);
         SQLiteDatabase sqlRead = sqlHelper.getReadableDatabase();
         
@@ -92,17 +91,18 @@ public class EventCacher
 			String description = sqlCursor.getString(sqlCursor.getColumnIndex("eventDescription"));
 			int typeID = sqlCursor.getInt(sqlCursor.getColumnIndex("typeID"));
 			
-			SharedPreferences sharedPrefs = context.getSharedPreferences(EventCacher.PREFS_NAME, 0);
-			int check = sharedPrefs.getInt(eventID, 0);
+			EventHolder tempHolder = new EventHolder();
+			tempHolder.name = name;
+			tempHolder.eventID = eventID;
+			tempHolder.description = description;
+			tempHolder.typeID = typeID;
 			
-			if (1 == check || !forSub) {
-				eventAdapter.add(name, description, eventID, typeID);
-			}
+			events.put(eventID, tempHolder);
 			
 			Log.d("GW2Events", "eventName:" + name + "; eventID:" + eventID + "; eventDescription:" + description + "; typeID:" + typeID);
 		}
 		
-		return eventAdapter;
+		return events;
     }
 	
 	/**

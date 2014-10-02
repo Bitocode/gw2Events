@@ -19,7 +19,7 @@ public class APICaller
 	public static final String LANG_SPANISH = "es";
 	public static final String LANG_GERMAN = "de";
 	
-	public static final String API_EVENTS        = "https://api.guildwars2.com/v1/events.json?world_id=<WORLD_ID>";
+	public static final String API_EVENTS        = "http://api.bitocode.com/1/guildwars/events/<WORLD_ID>";
 	public static final String API_EVENT_NAMES   = "http://api.bitocode.com/1/guildwars/event_names/<LANG>";
 	public static final String API_EVENT_DETAILS = "http://api.bitocode.com/1/guildwars/event_details/<LANG>/<EVENT_ID>";
 	public static final String API_MAP_NAMES     = "https://api.guildwars2.com/v1/map_names.json";

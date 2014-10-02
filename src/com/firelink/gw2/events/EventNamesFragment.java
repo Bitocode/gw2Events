@@ -3,6 +3,7 @@ package com.firelink.gw2.events;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -139,7 +140,12 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
         setServerName();
 
     	eventAdapter = new EventAdapter(context);
-    	eventAdapter = EventCacher.getCachedEventNames(true, context);
+    	
+    	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
+    		EventHolder tempHolder = entry.getValue();
+    		
+    		eventAdapter.add(tempHolder.name, tempHolder.description, tempHolder.eventID, tempHolder.typeID);
+    	}
         eventListView.setAdapter(eventAdapter);
     }
     
@@ -154,9 +160,7 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
         setServerName();
 
         if (eventAdapter == null) {
-        	eventAdapter = new EventAdapter(context);
-            eventAdapter = EventCacher.getCachedEventNames(false, context);
-            eventListView.setAdapter(eventAdapter);
+        	refresh();
         } else {
         	eventListView.setAdapter(eventAdapter);
         }

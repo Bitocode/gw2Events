@@ -1,5 +1,7 @@
 package com.firelink.gw2.events;
 
+import java.util.Map.Entry;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -93,7 +95,17 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         setServerName();
 
     	eventAdapter = new EventAdapter(context);
-    	eventAdapter = EventCacher.getCachedEventNames(true, context);
+    	SharedPreferences sharedPrefs = context.getSharedPreferences(EventCacher.PREFS_NAME, 0);
+		
+    	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
+    		EventHolder tempHolder = entry.getValue();
+    		
+			int check = sharedPrefs.getInt(tempHolder.eventID, 0);
+			
+			if (check == 1) {
+				eventAdapter.add(tempHolder.name, tempHolder.description, tempHolder.eventID, tempHolder.typeID);
+			}
+    	}
         eventListView.setAdapter(eventAdapter);
     }
     
@@ -108,9 +120,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         setServerName();
 
         if (eventAdapter == null) {
-        	eventAdapter = new EventAdapter(context);
-            eventAdapter = EventCacher.getCachedEventNames(true, context);
-            eventListView.setAdapter(eventAdapter);
+        	refresh();
         } else {
         	eventListView.setAdapter(eventAdapter);
         }
