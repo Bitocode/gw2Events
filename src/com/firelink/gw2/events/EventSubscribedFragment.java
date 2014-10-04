@@ -103,7 +103,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 			int check = sharedPrefs.getInt(tempHolder.eventID, 0);
 			
 			if (check == 1) {
-				eventAdapter.add(tempHolder.name, tempHolder.description, tempHolder.eventID, tempHolder.typeID);
+				eventAdapter.add(tempHolder);
 			}
     	}
         eventListView.setAdapter(eventAdapter);

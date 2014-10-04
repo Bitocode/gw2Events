@@ -6,11 +6,11 @@
     
     <LinearLayout 
         android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:layout_marginTop="10dp" 
-		android:layout_marginBottom="10dp"
-		android:orientation="horizontal"
-		android:background="@color/white" >
+        android:layout_height="fill_parent"
+        android:layout_marginTop="7dp" 
+    	android:layout_marginBottom="7dp"
+    	android:orientation="horizontal"
+    	android:background="@color/white" >
         
         <ImageView 
             android:id="@+id/eventAdapterLeftImageView"
@@ -18,6 +18,7 @@
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
+            android:contentDescription="@string/nothing"
             android:src="@drawable/event_level_standard" />
         
         <RelativeLayout 
@@ -35,25 +36,21 @@
                 android:paddingTop="25dp"
                 android:paddingBottom="25dp" />
             
-            <RelativeLayout 
-                android:id="@+id/eventAdapterExtraInfoLayout"
-                android:layout_width="fill_parent"
+            <TextView
+                android:id="@+id/eventAdapterTypeTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/eventAdapterTitleTextView"
-                android:visibility="gone" >
-                
-                <TextView
-                    android:id="@+id/eventAdapterDescriptionTextView"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:paddingRight="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingTop="25dp"
-                    android:paddingBottom="25dp" />
-                
-            </RelativeLayout>
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:background="@color/transparent"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+            
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

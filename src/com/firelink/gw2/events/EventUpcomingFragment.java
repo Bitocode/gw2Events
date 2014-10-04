@@ -197,12 +197,10 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
                     String eventID       = URLDecoder.decode(jsonObject.getString("event_id"), "UTF-8");
-                    int typeID           = jsonObject.getInt("event_class_id");
 
-                    //Add to adapter at some point
-                    eventAdapter.add(tempMap.get(eventID).name, tempMap.get(eventID).description, eventID, typeID);
                     
-                    //dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.EVENTS_CACHE_DIR, imageFileName);
+                    //Add to adapter at some point
+                    eventAdapter.add(tempMap.get(eventID));
                 }
             }
             catch (JSONException e)

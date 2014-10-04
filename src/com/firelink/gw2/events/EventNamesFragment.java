@@ -144,7 +144,7 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
     	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
     		EventHolder tempHolder = entry.getValue();
     		
-    		eventAdapter.add(tempHolder.name, tempHolder.description, tempHolder.eventID, tempHolder.typeID);
+    		eventAdapter.add(tempHolder);
     	}
         eventListView.setAdapter(eventAdapter);
     }
@@ -210,7 +210,7 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 
 			//Create our database tables
 			String[] initialQueries = new String[1];
-			initialQueries[0] = "CREATE TABLE " + SQLHelper.TABLE_NAME_EVENT + " ( eventID VARCHAR(255) PRIMARY KEY, eventName VARCHAR(255), eventDescription VARCHAR(900), typeID INTEGER ) ";
+			initialQueries[0] = "CREATE TABLE " + SQLHelper.TABLE_NAME_EVENT + " ( eventID VARCHAR(255) PRIMARY KEY, eventName VARCHAR(255), eventDescription VARCHAR(900), eventType VARCHAR(900), typeID INTEGER ) ";
 			
 			SQLHelper sqlHelper	= new SQLHelper(context, initialQueries);
 			
@@ -237,11 +237,13 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 					String name 		 = URLDecoder.decode(jsonObject.getString("short_name"), "UTF-8");
                     String description   = URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
                     String eventID       = URLDecoder.decode(jsonObject.getString("id"), "UTF-8");
+                    String eventType     = URLDecoder.decode(jsonObject.getString("event_class_name"), "UTF-8");
                     int typeID           = jsonObject.getInt("event_class_id");
 					
 					eventNameCV.put("eventID", eventID);
 					eventNameCV.put("eventName", name);
 					eventNameCV.put("eventDescription", description);
+					eventNameCV.put("eventType", eventType);
 					eventNameCV.put("typeID", typeID);
 					
 					try {

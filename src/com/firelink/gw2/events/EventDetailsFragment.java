@@ -49,6 +49,7 @@ public class EventDetailsFragment extends Fragment
 	
 	protected TextView descriptionTextView;
 	protected TextView startTimesTextView;
+	protected TextView[] headersTextView;
 	protected ImageView eventImageView;
 	
 	protected EventHolder eventHolder;
@@ -98,7 +99,7 @@ public class EventDetailsFragment extends Fragment
 		activity = getActivity();
 		context  = getActivity().getApplicationContext();
 		
-		//Set actionbar stuff
+		//Set ActionBar stuff
 		activity.getActionBar().setDisplayShowTitleEnabled(true);
 		activity.getActionBar().setDisplayHomeAsUpEnabled(true);
 		
@@ -109,6 +110,11 @@ public class EventDetailsFragment extends Fragment
 		Bundle bundle = getArguments();
 		
 		eventHolder.eventID = bundle.getString("eventID");
+		
+		headersTextView = new TextView[]{
+			(TextView)view.findViewById(R.id.eventDetailsView_descriptionHeaderTextView),
+			(TextView)view.findViewById(R.id.eventDetailsView_startTimesHeaderTextView),
+		};
 		
 		descriptionTextView = (TextView)view.findViewById(R.id.eventDetailsView_descriptionTextView);
 		startTimesTextView  = (TextView)view.findViewById(R.id.eventDetailsView_startTimesTextView);
@@ -247,13 +253,15 @@ public class EventDetailsFragment extends Fragment
 	        	eventHolder.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
 	            eventHolder.imageName   = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
 	            eventHolder.name        = URLDecoder.decode(eventObject.getString("name"), "UTF-8");
+	            eventHolder.type        = URLDecoder.decode(eventObject.getString("event_class_name"), "UTF-8");
+	            eventHolder.typeID      = eventObject.getInt("event_class_id");
 	            
+	            //Get the image
 	            EventCacher tempCacher = new EventCacher(context);
 	    		File tempFile          = new File(tempCacher.getCachePath() + EventCacher.CACHE_MEDIA_DIR, eventHolder.imageName);
 	        	eventHolder.image      = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
-	        	eventImageView.setImageDrawable(eventHolder.image);
-	        	descriptionTextView.setText(eventHolder.description);
 	        	
+	        	//Figure out this time BS
 	        	JSONArray timeArray = eventObject.getJSONArray("start_times");
 	        	
 	        	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
@@ -279,6 +287,31 @@ public class EventDetailsFragment extends Fragment
 	        		Log.d("GW2Events", i + ": " + sdf.format(eventHolder.startTimes[i]));
 	        	}
 	        	
+	        	//Set our views
+	        	//Determine which color to add to the eventClass left bar thing
+	            int eventColor;
+	            switch(eventHolder.typeID)
+	            {
+	                case 1:
+	                	eventColor      = R.color.gw_event_level_high;
+	                    break;
+	                case 2:
+	                	eventColor      = R.color.gw_event_level_standard;
+	                    break;
+	                case 3:
+	                	eventColor      = R.color.gw_event_level_low;
+	                    break;
+	                default:
+	                	eventColor      = R.color.gw_event_level_standard;
+	                    break;
+	            }
+	            
+	            for(int i = 0; i < headersTextView.length; i++) {
+	            	headersTextView[i].setBackgroundColor(context.getResources().getColor(eventColor));
+	            }
+	            
+	        	eventImageView.setImageDrawable(eventHolder.image);
+	        	descriptionTextView.setText(eventHolder.description);
 	        	startTimesTextView.setText(startTimes);
 	        }
 	        catch (JSONException e)

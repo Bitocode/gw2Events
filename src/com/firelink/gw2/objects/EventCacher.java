@@ -86,20 +86,22 @@ public class EventCacher
 		Cursor sqlCursor = sqlRead.query(SQLHelper.TABLE_NAME_EVENT, null, null, null, null, null, null);
 		
 		while (sqlCursor.moveToNext()) {
-			String name = sqlCursor.getString(sqlCursor.getColumnIndex("eventName"));
-			String eventID = sqlCursor.getString(sqlCursor.getColumnIndex("eventID"));
+			String name        = sqlCursor.getString(sqlCursor.getColumnIndex("eventName"));
+			String eventID     = sqlCursor.getString(sqlCursor.getColumnIndex("eventID"));
 			String description = sqlCursor.getString(sqlCursor.getColumnIndex("eventDescription"));
-			int typeID = sqlCursor.getInt(sqlCursor.getColumnIndex("typeID"));
+			String eventType   = sqlCursor.getString(sqlCursor.getColumnIndex("eventType"));
+			int typeID         = sqlCursor.getInt(sqlCursor.getColumnIndex("typeID"));
 			
 			EventHolder tempHolder = new EventHolder();
 			tempHolder.name = name;
 			tempHolder.eventID = eventID;
 			tempHolder.description = description;
+			tempHolder.type = eventType;
 			tempHolder.typeID = typeID;
 			
 			events.put(eventID, tempHolder);
 			
-			Log.d("GW2Events", "eventName:" + name + "; eventID:" + eventID + "; eventDescription:" + description + "; typeID:" + typeID);
+			//Log.d("GW2Events", "eventName:" + name + "; eventID:" + eventID + "; eventDescription:" + description + "; typeID:" + typeID);
 		}
 		
 		return events;

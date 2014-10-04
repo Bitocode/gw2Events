@@ -15,6 +15,7 @@ public class EventHolder
     public String waypoint;
     public String imageName;
     public Date[] startTimes;
+    public Date countdownTimer;
     public BitmapDrawable image;
     public int level;
     public int typeID;
