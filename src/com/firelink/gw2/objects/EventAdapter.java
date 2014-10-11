@@ -183,6 +183,8 @@ public class EventAdapter extends BaseAdapter
         	holder.eventNameTV.setBackgroundColor(context.getResources().getColor(eventBGActive));
         	
         	holder.eventTimerTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17.0f);
+        } else {
+        	holder.eventTimerTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
         }
         
         
@@ -201,8 +203,125 @@ public class EventAdapter extends BaseAdapter
     /**
      * 
      */
+    public void startInfiniteCountdown()
+    {
+    	countDowns.clear();
+    	
+    	Date date = new Date();
+    	try {
+			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
+    		date = sd.parse(sd.format(Calendar.getInstance().getTime()));
+			//date = sd.parse("05:29:55 PM");
+		} catch (ParseException e) {}
+    	
+    	for (int i = 0; i < getCount(); i++) {
+    		CountDownTimer timer = initCountdown(i, 0, date);
+    		
+    		if (timer != null) {
+    			if (countDowns.size() > i) {
+    				countDowns.set(i, timer);
+    			} else {
+    				countDowns.add(timer);
+    			}
+    		}
+    	}
+		
+		for (int i = 0; i < countDowns.size(); i++) {
+			countDowns.get(i).start();
+		}
+    }
+    
+    protected CountDownTimer initCountdown(final int index, final long offset, Date date)
+    {
+    	final EventHolder temp = getItem(index);
+		CountDownTimer timer = null;
+		
+		temp.startTime = temp.startTimes[EventHolder.getClosestDate(temp.startTimes, date)];
+		temp.endTime   = temp.endTimes[EventHolder.getClosestDate(temp.endTimes, date)];
+		
+		final long diff = temp.startTime.getTime() - date.getTime();
+		final long endDiff = temp.endTime.getTime() - date.getTime();
+		
+			timer = new CountDownTimer(diff, 1000) {
+				
+				@Override
+				public void onTick(long millisUntilFinished) {
+					if (diff > 0) {
+						
+						if (millisUntilFinished > diff - offset) {
+							return;
+						}
+						
+						if (endDiff < diff && endDiff > 0) {
+							if (millisUntilFinished > diff - endDiff) {
+								if (!temp.isActive) {
+									temp.isActive = true;
+									temp.countdownTimer = "Active";
+								}
+								
+								return;
+							}
+						}
+						
+						if (temp.isActive) {
+							temp.isActive = false;
+						}
+						
+						int hours = (int)((millisUntilFinished / 1000) / 60) / 60;
+						int minutes = (int)(millisUntilFinished / 1000) / 60 % 60;
+						int seconds = (int)(millisUntilFinished / 1000) % 60 % 60;
+						
+						Log.d("GW2Events", index + "");
+						//Display CountDown
+						temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+					} else {
+						temp.countdownTimer = "Active";
+					}
+					
+					refreshView();
+				}
+				
+				@Override
+				public void onFinish() {
+					temp.isActive = true;
+					temp.countdownTimer = "Active";
+					
+					Date date = new Date();
+			    	try {
+						SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
+			    		date = sd.parse(sd.format(Calendar.getInstance().getTime()));
+					} catch (ParseException e) {}
+			    	
+			    	long offset = 1000 * 60 * 15;
+			    	CountDownTimer timer = initCountdown(index, offset, date);
+		    		
+		    		if (timer != null) {
+		    			if (countDowns.size() > index) {
+		    				countDowns.set(index, timer);
+		    			} else {
+		    				countDowns.add(timer);
+		    			}
+		    		}
+		    		
+		    		countDowns.get(index).start();
+				}
+			};
+		
+		return timer;
+    }
+    
+    protected void onInfCountdownTick(long diff)
+    {
+    	
+    }
+    
+    /**
+     * 
+     */
     public void startCountdown()
     {
+    	countDowns.clear();
+    	
     	Date date = new Date();
     	try {
 			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
@@ -213,19 +332,23 @@ public class EventAdapter extends BaseAdapter
     	for (int i = 0; i < getCount(); i++) {
     		final EventHolder temp = getItem(i);
     		
-    		long diff = temp.startTime.getTime() - date.getTime();
+    		final long diff = temp.startTime.getTime() - date.getTime();
     		
-    		if (diff >= -1000) {
-    			CountDownTimer timer = new CountDownTimer(diff + 1000, 1000) {
+    		if (diff >= -500) {
+    			CountDownTimer timer = new CountDownTimer(diff + 2000, 1000) {
 					
 					@Override
 					public void onTick(long millisUntilFinished) {
-						int hours = (int)((millisUntilFinished / 1000) / 60) / 60;
-						int minutes = (int)(millisUntilFinished / 1000) / 60 % 60;
-						int seconds = (int)(millisUntilFinished / 1000) % 60 % 60;
-						
-						//Display CountDown
-						temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+						if (diff > 0) {
+							int hours = (int)((millisUntilFinished / 1000) / 60) / 60;
+							int minutes = (int)(millisUntilFinished / 1000) / 60 % 60;
+							int seconds = (int)(millisUntilFinished / 1000) % 60 % 60;
+							
+							//Display CountDown
+							temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+						} else {
+							temp.countdownTimer = "Active";
+						}
 						
 						refreshView();
 					}
@@ -234,6 +357,9 @@ public class EventAdapter extends BaseAdapter
 					public void onFinish() {
 						if (childFragInto != null) {
 							childFragInto.forceRefresh();
+						} else {
+							temp.isActive = true;
+							temp.countdownTimer = "Active";
 						}
 					}
 				};

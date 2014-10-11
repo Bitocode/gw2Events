@@ -85,6 +85,27 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     	initEventView();
     }
     
+    /** Called when the fragment pauses. */
+    @Override
+    public void onPause() 
+    {
+    	stopCountdown();
+    	super.onPause();
+    }
+    /** Called when the fragment detaches. */
+    @Override
+    public void onDetach() 
+    {
+    	super.onDetach();
+    }
+    /** Called when the fragment is destroyed. */
+    @Override
+    public void onDestroy() 
+    {
+    	stopCountdown();
+    	super.onDestroy();
+    }
+    
     /**
      * Should this activity refresh upon reopening?
      */
@@ -102,8 +123,9 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     {
         //Fix server name. Depends on size of the name
         setServerName();
-
-    	eventAdapter = new EventAdapter(context);
+        
+        eventAdapter.stopCountdown();
+    	eventAdapter.empty();
     	SharedPreferences sharedPrefs = context.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 		
     	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
@@ -112,10 +134,34 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 			int check = sharedPrefs.getInt(tempHolder.eventID, 0);
 			
 			if (check == 1) {
+				tempHolder = EventCacher.getEventCache(context, tempHolder.eventID);
+				
 				eventAdapter.add(tempHolder);
 			}
     	}
+    	
+    	startCountdown();
         eventListView.setAdapter(eventAdapter);
+    }
+    
+    /**
+     * Initiates the CountDown sequence
+     */
+    private void startCountdown()
+    {
+    	if (eventAdapter != null) {
+    		eventAdapter.startInfiniteCountdown();
+    	}
+    }
+    
+    /**
+     * Stops the CountDown sequence
+     */
+    private void stopCountdown()
+    {
+    	if (eventAdapter != null) {
+    		eventAdapter.stopCountdown();
+    	}
     }
     
     /**
@@ -129,6 +175,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         setServerName();
 
         if (eventAdapter == null) {
+        	eventAdapter = new EventAdapter(context);
         	refresh();
         } else {
         	eventListView.setAdapter(eventAdapter);

@@ -154,9 +154,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
     	Log.d("GW2Events", refreshLayout.isRefreshing() + "");
     	if (!refreshLayout.isRefreshing()) {
     		setABTitles();
-        	
-        	stopCountdown();
-        	eventAdapter.empty();
+    		
             new EventSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     	}
 	}
@@ -262,8 +260,6 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
             } else {
                 result = api.getLastError();
             }
-
-            Log.d("GW2Events", result + "");
 
             return result;
         }

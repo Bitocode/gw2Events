@@ -19,7 +19,9 @@ public class EventHolder implements Cloneable
     public String waypoint;
     public String imageName;
     public Date[] startTimes;
+    public Date[] endTimes;
     public Date startTime;
+    public Date endTime;
     public String countdownTimer;
     public BitmapDrawable image;
     public int level;
@@ -30,6 +32,33 @@ public class EventHolder implements Cloneable
     public EventHolder clone() throws CloneNotSupportedException 
     {
     	return (EventHolder)super.clone();
+    }
+    
+    /**
+     * 
+     * @param dates
+     * @return The index to the date closest to now
+     */
+    public static int getClosestDate(Date[] dates, Date currDate)
+    {
+    	long min = dates[0].getTime() - currDate.getTime();
+		int startIndex = 0;
+		
+		for (int i = 0; i < dates.length; i++) {
+			long diff = dates[i].getTime() - currDate.getTime();
+			
+			if (diff < 0) {
+				continue;
+			}
+			
+			if (min > diff || min < 0) {
+				min = diff;
+				startIndex = i;
+			}
+		}
+		
+		return startIndex;
+    	
     }
     
     /**

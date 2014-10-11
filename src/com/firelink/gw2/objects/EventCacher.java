@@ -171,12 +171,21 @@ public class EventCacher
 	        	eventHolder.image      = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
 	        	
 	        	//Figure out this time BS
-	        	JSONArray timeArray = eventObject.getJSONArray("start_times");
+	        	JSONArray timeStartArray = eventObject.getJSONArray("start_times");
 	        	
-	        	eventHolder.startTimes = new Date[timeArray.length()];
-	        	for (int i = 0; i < timeArray.length(); i++)
+	        	eventHolder.startTimes = new Date[timeStartArray.length()];
+	        	for (int i = 0; i < timeStartArray.length(); i++)
 	        	{
-	        		eventHolder.startTimes[i] = EventHolder.convertDateToLocal(timeArray.getString(i));
+	        		eventHolder.startTimes[i] = EventHolder.convertDateToLocal(timeStartArray.getString(i));
+	        	}
+	        	
+	        	//Figure out this time BS
+	        	JSONArray timeEndArray = eventObject.getJSONArray("end_times");
+	        	
+	        	eventHolder.endTimes = new Date[timeEndArray.length()];
+	        	for (int i = 0; i < timeEndArray.length(); i++)
+	        	{
+	        		eventHolder.endTimes[i] = EventHolder.convertDateToLocal(timeEndArray.getString(i));
 	        	}
 	        }
 	        catch (JSONException e)
