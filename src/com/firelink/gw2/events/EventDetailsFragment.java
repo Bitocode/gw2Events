@@ -1,15 +1,9 @@
 package com.firelink.gw2.events;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Date;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -230,96 +224,43 @@ public class EventDetailsFragment extends Fragment
 	 */
 	private void parseCache()
 	{
-		EventCacher ec = new EventCacher(context);
-		File cacheFile = new File(ec.getCachePath() + File.separator + EventCacher.CACHE_APIS_DIR + File.separator + eventHolder.eventID);
-		String json = "";
+		eventHolder = EventCacher.getEventCache(context, eventHolder.eventID);
 		
-		Log.d("GW2Events", "parseCache: " + eventHolder.eventID);
-		if (cacheFile.exists())
-		{
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(cacheFile));
-				StringBuilder buffer = new StringBuilder();
-				String line = "";
-				
-				while ((line = br.readLine()) != null)
-				{
-					buffer.append(line);
-				}
-				
-				json = buffer.toString();
-				br.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			
-			try
-	        {
-	        	JSONObject eventObject = new JSONObject(json);
-	            
-	        	eventHolder.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
-	            eventHolder.imageName   = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
-	            eventHolder.name        = URLDecoder.decode(eventObject.getString("name"), "UTF-8");
-	            eventHolder.type        = URLDecoder.decode(eventObject.getString("event_class_name"), "UTF-8");
-	            eventHolder.typeID      = eventObject.getInt("event_class_id");
-	            
-	            //Get the image
-	            EventCacher tempCacher = new EventCacher(context);
-	    		File tempFile          = new File(tempCacher.getCachePath() + EventCacher.CACHE_MEDIA_DIR, eventHolder.imageName);
-	        	eventHolder.image      = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
-	        	
-	        	//Figure out this time BS
-	        	JSONArray timeArray = eventObject.getJSONArray("start_times");
-	        	
-	        	eventHolder.startTimes = new Date[timeArray.length()];
-	        	String startTimes = "";
-	        	for (int i = 0; i < timeArray.length(); i++)
-	        	{
-	        		eventHolder.startTimes[i] = EventHolder.convertDateToLocal(timeArray.getString(i));
-	        		
-	        		//Print it
-	        		startTimes = startTimes.concat(EventHolder.formatDateToTime(eventHolder.startTimes[i]) + "\n");
+		String startTimes = "";
+    	for (int i = 0; i < eventHolder.startTimes.length; i++)
+    	{
+    		//Print it
+    		startTimes = startTimes.concat(EventHolder.formatDateToTime(eventHolder.startTimes[i]) + "\n");
 
-	        		Log.d("GW2Events", i + ": " + EventHolder.formatDateToTime(eventHolder.startTimes[i]));
-	        	}
-	        	
-	        	//Set our views
-	        	//Determine which color to add to the eventClass left bar thing
-	            int eventColor;
-	            switch(eventHolder.typeID)
-	            {
-	                case 1:
-	                	eventColor      = R.color.gw_event_level_high;
-	                    break;
-	                case 2:
-	                	eventColor      = R.color.gw_event_level_standard;
-	                    break;
-	                case 3:
-	                	eventColor      = R.color.gw_event_level_low;
-	                    break;
-	                default:
-	                	eventColor      = R.color.gw_event_level_standard;
-	                    break;
-	            }
-	            
-	            for(int i = 0; i < headersTextView.length; i++) {
-	            	headersTextView[i].setBackgroundColor(context.getResources().getColor(eventColor));
-	            }
-	            
-	        	eventImageView.setImageDrawable(eventHolder.image);
-	        	descriptionTextView.setText(eventHolder.description);
-	        	startTimesTextView.setText(startTimes);
-	        }
-	        catch (JSONException e)
-	        {
-	            Log.d("GW2Events", e.getMessage() + ": " + json);
-	        } catch (UnsupportedEncodingException e) {
-				Log.d("GW2Events", e.getMessage());
-			}
-		}
+    		Log.d("GW2Events", i + ": " + EventHolder.formatDateToTime(eventHolder.startTimes[i]));
+    	}
+    	
+    	//Set our views
+    	//Determine which color to add to the eventClass left bar thing
+        int eventColor;
+        switch(eventHolder.typeID)
+        {
+            case 1:
+            	eventColor      = R.color.gw_event_level_high;
+                break;
+            case 2:
+            	eventColor      = R.color.gw_event_level_standard;
+                break;
+            case 3:
+            	eventColor      = R.color.gw_event_level_low;
+                break;
+            default:
+            	eventColor      = R.color.gw_event_level_standard;
+                break;
+        }
+        
+        for(int i = 0; i < headersTextView.length; i++) {
+        	headersTextView[i].setBackgroundColor(context.getResources().getColor(eventColor));
+        }
+        
+    	eventImageView.setImageDrawable(eventHolder.image);
+    	descriptionTextView.setText(eventHolder.description);
+    	startTimesTextView.setText(startTimes);
 	}
 	
 	 /**

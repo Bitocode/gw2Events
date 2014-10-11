@@ -81,6 +81,11 @@ public class EventAdapter extends BaseAdapter
         this.notifyDataSetChanged();
     }
     
+    public void empty()
+    {
+    	this.eventData.clear();
+    }
+    
     /**
      * 
      * @param activity
@@ -202,6 +207,7 @@ public class EventAdapter extends BaseAdapter
     	try {
 			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
     		date = sd.parse(sd.format(Calendar.getInstance().getTime()));
+			//date = sd.parse("01:14:55 PM");
 		} catch (ParseException e) {}
     	
     	for (int i = 0; i < getCount(); i++) {
@@ -214,12 +220,12 @@ public class EventAdapter extends BaseAdapter
 					
 					@Override
 					public void onTick(long millisUntilFinished) {
-						double hours = ((millisUntilFinished / 1000) / 60) / 60;
-						double minutes = (millisUntilFinished / 1000) / 60 % 60;
-						double seconds = (millisUntilFinished / 1000) % 60 % 60;
+						int hours = (int)((millisUntilFinished / 1000) / 60) / 60;
+						int minutes = (int)(millisUntilFinished / 1000) / 60 % 60;
+						int seconds = (int)(millisUntilFinished / 1000) % 60 % 60;
 						
-						//Display countdown
-						temp.countdownTimer = String.format("%02d", (int)hours) + ":" + String.format("%02d", (int)minutes) + ":" + String.format("%02d", (int)seconds);
+						//Display CountDown
+						temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
 						
 						refreshView();
 					}

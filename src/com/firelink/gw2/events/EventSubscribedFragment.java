@@ -22,19 +22,20 @@ import com.firelink.gw2.objects.RefreshInterface;
 
 public class EventSubscribedFragment extends Fragment implements RefreshInterface
 {
+	//High level fields
     protected Activity activity;
     protected Context context;
     protected Fragment fragment;
-
+    //Views
     protected ListView eventListView;
     protected ProgressDialog eventProgDialog;
     protected ActionBar actionBar;
-    protected SharedPreferences sharedPrefs;
-
+    //Custom data
     protected int serverID;
     protected String serverName;
     protected EventAdapter eventAdapter;
-
+    
+    /** Some empty constructor */
     public EventSubscribedFragment(){}
     
     /** Called when the activity is first created. */
@@ -43,23 +44,25 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     {
         super.onCreate(savedInstanceState);
         
-        //Set actionbar stuff
-        actionBar = getActivity().getActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
-        
+        //Set the activity
         activity = getActivity();
         context  = getActivity().getApplicationContext();
         fragment = this;
         
-        fragment.setRetainInstance(true);
+        //Set ActionBar stuff
+        actionBar = activity.getActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
         
-        //
-        sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
+        //Preference
+        SharedPreferences sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
         serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
         serverName = sharedPrefs.getString(EventCacher.PREFS_SERVER_NAME, "Pizza");
+        
+        fragment.setRetainInstance(true);
     }
     
+    /** Called when the view is inflated */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) 
@@ -73,6 +76,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         return view;
     }
     
+    /** Called when the fragment resumes. */
     @Override
     public void onResume() 
     {
@@ -81,6 +85,9 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     	initEventView();
     }
     
+    /**
+     * Should this activity refresh upon reopening?
+     */
     @Override
     public boolean isRefreshOnOpen() 
     {
@@ -88,7 +95,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     }
     
     /**
-     * 
+     * Refreshes the data
      */
     @Override
     public void refresh()

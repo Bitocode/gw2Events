@@ -65,21 +65,22 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
     {
         super.onCreate(savedInstanceState);
         
-        //Set actionbar stuff
-        actionBar = getActivity().getActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
-        
+        //Set the activity
         activity = getActivity();
         context  = getActivity().getApplicationContext();
         fragment = this;
         
-        fragment.setRetainInstance(true);
+        //Set ActionBar stuff
+        actionBar = activity.getActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
         
-        //
+        //Preference
         SharedPreferences sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
         serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
         serverName = sharedPrefs.getString(EventCacher.PREFS_SERVER_NAME, "Pizza");
+        
+        fragment.setRetainInstance(true);
     }
     
     /**
@@ -138,7 +139,6 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
     @Override
     public void refresh()
     {
-        //Fix server name. Depends on size of the name
         setServerName();
 
     	eventAdapter = new EventAdapter(context);
