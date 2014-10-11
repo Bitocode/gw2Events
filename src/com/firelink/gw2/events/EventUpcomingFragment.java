@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -61,11 +62,15 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
         context  = getActivity().getApplicationContext();
         fragment = this;
         
+        fragment.setRetainInstance(true);
+        
         SharedPreferences sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
-        serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
+        serverID = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
     }
-    
+    /**
+     * 
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) 
@@ -85,9 +90,52 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
 		});
         refreshLayout.setColorSchemeResources(R.color.gw_red, R.color.black, R.color.gw_event_level_standard, R.color.gw_event_level_high);
         
+        stopCountdown();
         initEventView();
     	
         return view;
+    }
+    /**
+     * 
+     */
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) 
+    {
+    	super.onConfigurationChanged(newConfig);
+    	
+    	stopCountdown();
+    }
+    @Override
+    public void onDetach() 
+    {
+    	super.onDetach();
+    }
+    /**
+     * 
+     */
+    @Override
+    public void onDestroy() 
+    {
+    	stopCountdown();
+    	super.onDestroy();
+    }
+    /**
+     * 
+     */
+    @Override
+    public void onPause() 
+    {
+    	stopCountdown();
+    	super.onPause();
+    }
+    /**
+     * 
+     */
+    @Override
+    public void onResume() 
+    {
+    	super.onResume();
+    	startCountdown();
     }
     
     @Override
@@ -101,9 +149,25 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
     {
     	setServerName();
     	
+    	stopCountdown();
     	eventAdapter = new EventAdapter(context);
+    	eventAdapter.setInterface(getActivity());
         new EventSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
+    
+    private void startCountdown()
+    {
+    	if (eventAdapter != null) {
+    		eventAdapter.startCountdown();
+    	}
+    }
+    
+    private void stopCountdown()
+    {
+    	if (eventAdapter != null) {
+    		eventAdapter.stopCountdown();
+    	}
+    }
     
     /**
      * Initiates the events view
@@ -117,6 +181,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
 
         if (eventAdapter == null) {
         	eventAdapter = new EventAdapter(context);
+        	eventAdapter.setInterface(getActivity());
             new EventSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
         	eventListView.setAdapter(eventAdapter);
@@ -162,6 +227,8 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
         {
             super.onPreExecute();
             refreshLayout.setRefreshing(true);
+            
+            stopCountdown();
         }
 
         @Override
@@ -197,10 +264,17 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
                 for(int i = 0; i < json.length(); i++){
                     JSONObject jsonObject = json.getJSONObject(i);
                     String eventID       = URLDecoder.decode(jsonObject.getString("event_id"), "UTF-8");
-
+                    String startTime     = URLDecoder.decode(jsonObject.getString("start_time"), "UTF-8");
+                    String status        = URLDecoder.decode(jsonObject.getString("status"), "UTF-8");
+                    boolean isActive     = status.equals("Active")? true : false;
                     
+                    EventHolder temp = tempMap.get(eventID).clone();
+                    
+	        		temp.startTime = EventHolder.convertDateToLocal(startTime);
+	        		temp.isActive       = isActive;
+	        		 
                     //Add to adapter at some point
-                    eventAdapter.add(tempMap.get(eventID));
+                    eventAdapter.add(temp);
                 }
             }
             catch (JSONException e)
@@ -208,11 +282,14 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
             	Log.d("GW2Events", e.getMessage());
             } catch (UnsupportedEncodingException e) {
             	Log.d("GW2Events", e.getMessage());
+			} catch (CloneNotSupportedException e) {
+				Log.d("GW2Events", e.getMessage());
 			}
 
             //Reset adapter
             eventListView.setAdapter(null);
             eventListView.setAdapter(eventAdapter);
+            startCountdown();
 
             refreshLayout.setRefreshing(false);
         }

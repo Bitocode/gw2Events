@@ -7,11 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,9 +78,29 @@ public class EventDetailsFragment extends Fragment
 		
 		setHasOptionsMenu(true);
 		
-		sharedPrefs 		= getActivity().getSharedPreferences(EventCacher.PREFS_NAME, 0);
+		activity = getActivity();
+		context  = getActivity().getApplicationContext();
+		
+		//Set ActionBar stuff
+		activity.getActionBar().setDisplayShowTitleEnabled(true);
+		activity.getActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		sharedPrefs 		= activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 		sharedPrefsEditor 	= sharedPrefs.edit();
-		sharedPrefsEditor.commit();		
+		sharedPrefsEditor.commit();
+		
+		eventHolder        = new EventHolder();
+		eventDetailsDialog = new ProgressDialog(activity);
+		
+		Bundle bundle = getArguments();
+		
+		if (null != bundle) {
+			eventHolder.eventID = bundle.getString("eventID", "0");
+		}
+		
+		if (null != savedInstanceState) { 
+			eventHolder.eventID = savedInstanceState.getString("eventID", "0");
+		}
 	}
 	
 	/**
@@ -96,20 +112,6 @@ public class EventDetailsFragment extends Fragment
 	{
 		View view = inflater.inflate(R.layout.event_details_layout, container, false);
 		
-		activity = getActivity();
-		context  = getActivity().getApplicationContext();
-		
-		//Set ActionBar stuff
-		activity.getActionBar().setDisplayShowTitleEnabled(true);
-		activity.getActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		
-		eventHolder        = new EventHolder();
-		eventDetailsDialog = new ProgressDialog(activity);
-		
-		Bundle bundle = getArguments();
-		
-		eventHolder.eventID = bundle.getString("eventID");
 		
 		headersTextView = new TextView[]{
 			(TextView)view.findViewById(R.id.eventDetailsView_descriptionHeaderTextView),
@@ -151,7 +153,7 @@ public class EventDetailsFragment extends Fragment
 	{
 		super.onDetach();
 		//refreshInterface.refresh();
-		childFragInto.refreshOnUpdate();
+		childFragInto.refreshOnBack();
 	}
 	
 	@Override
@@ -171,6 +173,13 @@ public class EventDetailsFragment extends Fragment
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) 
+	{
+		outState.putString("eventID", eventHolder.eventID);
+		super.onSaveInstanceState(outState);
 	}
 	
 	@Override
@@ -225,6 +234,7 @@ public class EventDetailsFragment extends Fragment
 		File cacheFile = new File(ec.getCachePath() + File.separator + EventCacher.CACHE_APIS_DIR + File.separator + eventHolder.eventID);
 		String json = "";
 		
+		Log.d("GW2Events", "parseCache: " + eventHolder.eventID);
 		if (cacheFile.exists())
 		{
 			try {
@@ -264,27 +274,16 @@ public class EventDetailsFragment extends Fragment
 	        	//Figure out this time BS
 	        	JSONArray timeArray = eventObject.getJSONArray("start_times");
 	        	
-	        	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
-	        	TimeZone utcTZ   = TimeZone.getTimeZone("UTC");
-	        	TimeZone localTZ = TimeZone.getDefault();
-	        	
 	        	eventHolder.startTimes = new Date[timeArray.length()];
 	        	String startTimes = "";
 	        	for (int i = 0; i < timeArray.length(); i++)
 	        	{
-	        		//Parse UTC times
-	        		sdf.setTimeZone(utcTZ);
-	        		eventHolder.startTimes[i] = sdf.parse(timeArray.getString(i));
-	        		//Change to local timezone somewhere
-	        		sdf.setTimeZone(localTZ);
-	        		//Add offset from DST, if there is one
-	        		eventHolder.startTimes[i] = sdf.parse(sdf.format(eventHolder.startTimes[i]) + 
-	        				((localTZ.inDaylightTime(new Date()) ? localTZ.getDSTSavings() : 0) / 1000));
+	        		eventHolder.startTimes[i] = EventHolder.convertDateToLocal(timeArray.getString(i));
 	        		
 	        		//Print it
-	        		startTimes = startTimes.concat(sdf.format(eventHolder.startTimes[i]) + "\n");
+	        		startTimes = startTimes.concat(EventHolder.formatDateToTime(eventHolder.startTimes[i]) + "\n");
 
-	        		Log.d("GW2Events", i + ": " + sdf.format(eventHolder.startTimes[i]));
+	        		Log.d("GW2Events", i + ": " + EventHolder.formatDateToTime(eventHolder.startTimes[i]));
 	        	}
 	        	
 	        	//Set our views
@@ -317,9 +316,7 @@ public class EventDetailsFragment extends Fragment
 	        catch (JSONException e)
 	        {
 	            Log.d("GW2Events", e.getMessage() + ": " + json);
-	        } catch (ParseException e) {
-	        	Log.d("GW2Events", e.getMessage());
-			} catch (UnsupportedEncodingException e) {
+	        } catch (UnsupportedEncodingException e) {
 				Log.d("GW2Events", e.getMessage());
 			}
 		}

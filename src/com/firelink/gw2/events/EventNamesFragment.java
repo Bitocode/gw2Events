@@ -73,6 +73,8 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
         context  = getActivity().getApplicationContext();
         fragment = this;
         
+        fragment.setRetainInstance(true);
+        
         //
         SharedPreferences sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
@@ -257,6 +259,9 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 			} catch (UnsupportedEncodingException e) {
 				Log.d("GW2Events", e.getMessage());
 			}
+			
+			sqlHelper.close();
+			sqlWrite.close();
 			
 			return true;
 		}	

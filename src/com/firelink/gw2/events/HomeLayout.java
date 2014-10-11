@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +23,7 @@ import com.firelink.gw2.objects.RefreshInterface;
 public class HomeLayout extends Activity implements ChildFragmentInterface
 {
 	private String[] jEventViews;
+	private int currentPosition;
 	private DrawerLayout jDrawerLayout;
 	private ListView jDrawerListView;
 	private Fragment parentFragment;
@@ -88,10 +90,31 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 		getActionBar().setHomeButtonEnabled(true);
 		
 		//Set default fragment
-		selectItem(0);
+		if (savedInstanceState != null) {
+			//Load parent tab
+			selectItem(savedInstanceState.getInt("currentTab", 0));
+			//Check if child tab was open
+			String className = savedInstanceState.getString("childFragment", "0");
+			
+			if (className != "0") {
+				try {
+					Fragment fragment = (Fragment) Class.forName(className).newInstance();
+					fragment.setArguments(savedInstanceState.getBundle("childArgs"));
+					selectDetailItem(fragment);
+				} catch (ClassNotFoundException e) {
+					Log.d("GW2Events", e.getMessage());
+				} catch (InstantiationException e) {
+					Log.d("GW2Events", e.getMessage());
+				} catch (IllegalAccessException e) {
+					Log.d("GW2Events", e.getMessage());
+				}
+			}
+		} else {
+			selectItem(0);
+		}
+		
 		
 	}
-	
 	/**
 	 * 
 	 */
@@ -109,9 +132,9 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 	@Override
 	public void onBackPressed() 
 	{
+		childFragment = null;
 		super.onBackPressed();
 	}
-	
 	/**
 	 * 
 	 */
@@ -121,7 +144,39 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 		super.onConfigurationChanged(newConfig);
 		jDrawerToggle.onConfigurationChanged(newConfig);
 	}
-	
+	/**
+	 * 
+	 * @param outState
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState) 
+	{
+		outState.putInt("currentTab", currentPosition);
+		if (childFragment != null) {
+			outState.putBundle("childArgs", childFragment.getArguments());
+			outState.putString("childFragment", childFragment.getClass().getName());
+		}
+		
+		super.onSaveInstanceState(outState);
+	}
+	/**
+	 * 
+	 */
+	@Override
+	protected void onDestroy() 
+	{
+		super.onDestroy();
+	}
+	@Override
+	protected void onPause() 
+	{
+		super.onPause();
+	}
+	@Override
+	protected void onResume() 
+	{
+		super.onResume();
+	}
 	/**
 	 * 
 	 */
@@ -139,6 +194,7 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 	
 		switch (item.getItemId()) {
 			case android.R.id.home:
+				childFragment = null;
 				super.onBackPressed();
 		}
 		
@@ -146,13 +202,28 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 	}
 	
 	@Override
-	public void refreshOnUpdate() 
+	public void refreshOnBack() 
 	{
 		boolean refresh = false;
 		
 		Fragment fragment = getFragmentManager().findFragmentByTag(parentFragment.getClass().getName());
 		if (fragment != null) {
 			refresh = ((RefreshInterface)fragment).isRefreshOnOpen();
+		}
+		
+		if (refresh) {
+			((RefreshInterface) getFragmentManager().findFragmentByTag(parentFragment.getClass().getName())).refresh();
+		}
+	}
+	
+	@Override
+	public void forceRefresh() 
+	{
+boolean refresh = false;
+		
+		Fragment fragment = getFragmentManager().findFragmentByTag(parentFragment.getClass().getName());
+		if (fragment != null) {
+			refresh = true;
 		}
 		
 		if (refresh) {
@@ -206,12 +277,13 @@ public class HomeLayout extends Activity implements ChildFragmentInterface
 			
 			jDrawerListView.setItemChecked(position, true);
 			jDrawerLayout.closeDrawer(jDrawerListView);
+			
+			currentPosition = position;
+			childFragment = null;
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("GW2Events", e.getMessage());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d("GW2Events", e.getMessage());
 		}
 	}
 	

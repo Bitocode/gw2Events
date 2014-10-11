@@ -104,6 +104,10 @@ public class EventCacher
 			//Log.d("GW2Events", "eventName:" + name + "; eventID:" + eventID + "; eventDescription:" + description + "; typeID:" + typeID);
 		}
 		
+		sqlHelper.close();
+		sqlRead.close();
+		sqlCursor.close();
+		
 		return events;
     }
 	

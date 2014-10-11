@@ -51,6 +51,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         context  = getActivity().getApplicationContext();
         fragment = this;
         
+        fragment.setRetainInstance(true);
+        
         //
         sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
