@@ -272,56 +272,56 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 	 */
 	public class DataCacher extends AsyncTask<Void, Void, String>
 	{
-		 @Override
-	        protected void onPreExecute()
-	        {
-	            super.onPreExecute();
-	        }
+		@Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
 
-	        @Override
-	        protected String doInBackground(Void...params)
-	        {
-	            String result = "";
-	            APICaller api = new APICaller();
+        @Override
+        protected String doInBackground(Void...params)
+        {
+            String result = "";
+            APICaller api = new APICaller();
 
-	            api.setAPI(APICaller.API_EVENT_DETAILS);
-	            api.setLanguage(APICaller.LANG_ENGLISH);
-	            api.setEventID("");
+            api.setAPI(APICaller.API_EVENT_DETAILS);
+            api.setLanguage(APICaller.LANG_ENGLISH);
+            api.setEventID("");
 
-	            if (api.callAPI()) {
-	                result = api.getJSONString();
-	            } else {
-	                result = api.getLastError();
-	            }
+            if (api.callAPI()) {
+                result = api.getJSONString();
+            } else {
+                result = api.getLastError();
+            }
 
-	            Log.d("GW2Events", result + "");
-	            
-	            try
-	            {
-	                EventCacher dCH = new EventCacher(context);
-	                
-	                JSONObject eventsObject = new JSONObject(result);
-	                eventsObject = eventsObject.getJSONObject("events");
-	                Iterator<?> iterator = eventsObject.keys();
-	                
-	                while (iterator.hasNext()) 
-	                {
-	                	String key = iterator.next().toString();
-	                	JSONObject eventObject = eventsObject.getJSONObject(key);
-	                	String imagePath       = eventObject.getString("imagePath");
-	                	String imageFileName   = eventObject.getString("imageFileName");
-	                	
-	                    dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.CACHE_MEDIA_DIR, imageFileName);
-	                    
-	                    dCH.cacheEventsAPI(eventObject.toString(), EventCacher.CACHE_APIS_DIR, key);
-	                }
-	            }
-	            catch (JSONException e)
-	            {
-	                Log.d("GW2Events", e.getMessage());
-	            }
+            Log.d("GW2Events", result + "");
+            
+            try
+            {
+                EventCacher dCH = new EventCacher(context);
+                
+                JSONObject eventsObject = new JSONObject(result);
+                eventsObject = eventsObject.getJSONObject("events");
+                Iterator<?> iterator = eventsObject.keys();
+                
+                while (iterator.hasNext()) 
+                {
+                	String key = iterator.next().toString();
+                	JSONObject eventObject = eventsObject.getJSONObject(key);
+                	String imagePath       = eventObject.getString("imagePath");
+                	String imageFileName   = eventObject.getString("imageFileName");
+                	
+                    dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.CACHE_MEDIA_DIR, imageFileName);
+                    
+                    dCH.cacheEventsAPI(eventObject.toString(), EventCacher.CACHE_APIS_DIR, key);
+                }
+            }
+            catch (JSONException e)
+            {
+                Log.d("GW2Events", e.getMessage());
+            }
 
-	            return result;
-	        }
+            return result;
+        }
 	}
 }

@@ -8,6 +8,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     protected int serverID;
     protected String serverName;
     protected EventAdapter eventAdapter;
+    protected EventCacher ec;
     
     /** Some empty constructor */
     public EventSubscribedFragment(){}
@@ -58,6 +60,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 
         serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
         serverName = sharedPrefs.getString(EventCacher.PREFS_SERVER_NAME, "Pizza");
+        
+        ec = new EventCacher(context);
         
         fragment.setRetainInstance(true);
     }
@@ -118,30 +122,13 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     /**
      * Refreshes the data
      */
-    @Override
+	@Override
     public void refresh()
     {
         //Fix server name. Depends on size of the name
         setServerName();
         
-        eventAdapter.stopCountdown();
-    	eventAdapter.empty();
-    	SharedPreferences sharedPrefs = context.getSharedPreferences(EventCacher.PREFS_NAME, 0);
-		
-    	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
-    		EventHolder tempHolder = entry.getValue();
-    		
-			int check = sharedPrefs.getInt(tempHolder.eventID, 0);
-			
-			if (check == 1) {
-				tempHolder = EventCacher.getEventCache(context, tempHolder.eventID);
-				
-				eventAdapter.add(tempHolder);
-			}
-    	}
-    	
-    	startCountdown();
-        eventListView.setAdapter(eventAdapter);
+        new DisplayData().execute();
     }
     
     /**
@@ -210,4 +197,45 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
             ((HomeLayout)getActivity()).selectDetailItem(childFragment);
         }
     };
+    
+    /**
+   	 * This caches our background data that we might use in the future
+   	 */
+	public class DisplayData extends AsyncTask<Void, Void, EventAdapter> 
+	{
+		@Override
+		protected void onPreExecute() 
+		{
+			eventAdapter.stopCountdown();
+			eventAdapter.empty();
+		}
+
+		@Override
+		protected EventAdapter doInBackground(Void... params) 
+		{
+			SharedPreferences sharedPrefs = context.getSharedPreferences(
+					EventCacher.PREFS_NAME, 0);
+
+			for (Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
+				EventHolder tempHolder = entry.getValue();
+
+				int check = sharedPrefs.getInt(tempHolder.eventID, 0);
+
+				if (check == 1) {
+					tempHolder = ec.getEventJSONCache(tempHolder);
+
+					eventAdapter.add(tempHolder);
+				}
+			}
+
+			return eventAdapter;
+		}
+
+		@Override
+		protected void onPostExecute(EventAdapter result) 
+		{
+			startCountdown();
+			eventListView.setAdapter(eventAdapter);
+		}
+	}
 }

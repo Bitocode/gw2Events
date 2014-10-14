@@ -122,16 +122,12 @@ public class EventCacher
 	
 	/**
 	 * 
-	 * @param eventID
-	 * @return String[]
+	 * @param fields
+	 * @return
 	 */
-	public static EventHolder getEventCache(Context context, String eventID)
+	public EventHolder getEventJSONCache(EventHolder fields)
 	{
-		EventHolder eventHolder = new EventHolder();
-		eventHolder.eventID = eventID;
-		
-		EventCacher ec = new EventCacher(context);
-		File cacheFile = new File(ec.getCachePath() + File.separator + EventCacher.CACHE_APIS_DIR + File.separator + eventHolder.eventID);
+		File cacheFile = new File(getCachePath() + File.separator + EventCacher.CACHE_APIS_DIR + File.separator + fields.eventID);
 		String json = "";
 		
 		if (cacheFile.exists())
@@ -158,35 +154,46 @@ public class EventCacher
 			try
 	        {
 	        	JSONObject eventObject = new JSONObject(json);
+	        	
+	        	if (fields.description == null) {
+	        		fields.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
+	        	}
+	        	if (fields.imageName == null) {
+	        		fields.imageName   = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
+	        	}
+	        	if (fields.name == null) {
+	        		fields.name        = URLDecoder.decode(eventObject.getString("name"), "UTF-8");
+	        	}
+	            if (fields.type == null) {
+	            	fields.type        = URLDecoder.decode(eventObject.getString("event_class_name"), "UTF-8");
+	            }
+	            if (fields.typeID == 0) {
+	            	fields.typeID      = eventObject.getInt("event_class_id");
+	            }
 	            
-	        	eventHolder.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
-	            eventHolder.imageName   = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
-	            eventHolder.name        = URLDecoder.decode(eventObject.getString("name"), "UTF-8");
-	            eventHolder.type        = URLDecoder.decode(eventObject.getString("event_class_name"), "UTF-8");
-	            eventHolder.typeID      = eventObject.getInt("event_class_id");
-	            
-	            //Get the image
-	            EventCacher tempCacher = new EventCacher(context);
-	    		File tempFile          = new File(tempCacher.getCachePath() + EventCacher.CACHE_MEDIA_DIR, eventHolder.imageName);
-	        	eventHolder.image      = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+	        	//Figure out this time BS
+	    		if (fields.startTimes == null) {
+	    			JSONArray timeStartArray = eventObject.getJSONArray("start_times");
+	        	
+	    			fields.startTimes = new Date[timeStartArray.length()];
+		        	for (int i = 0; i < timeStartArray.length(); i++)
+		        	{
+		        		fields.startTimes[i] = EventHolder.convertDateToLocal(timeStartArray.getString(i));
+		        	}
+	    		}
+	        	
 	        	
 	        	//Figure out this time BS
-	        	JSONArray timeStartArray = eventObject.getJSONArray("start_times");
+	    		if (fields.endTimes == null) {
+	    			JSONArray timeEndArray = eventObject.getJSONArray("end_times");
 	        	
-	        	eventHolder.startTimes = new Date[timeStartArray.length()];
-	        	for (int i = 0; i < timeStartArray.length(); i++)
-	        	{
-	        		eventHolder.startTimes[i] = EventHolder.convertDateToLocal(timeStartArray.getString(i));
-	        	}
+	    			fields.endTimes = new Date[timeEndArray.length()];
+		        	for (int i = 0; i < timeEndArray.length(); i++)
+		        	{
+		        		fields.endTimes[i] = EventHolder.convertDateToLocal(timeEndArray.getString(i));
+		        	}
+	    		}
 	        	
-	        	//Figure out this time BS
-	        	JSONArray timeEndArray = eventObject.getJSONArray("end_times");
-	        	
-	        	eventHolder.endTimes = new Date[timeEndArray.length()];
-	        	for (int i = 0; i < timeEndArray.length(); i++)
-	        	{
-	        		eventHolder.endTimes[i] = EventHolder.convertDateToLocal(timeEndArray.getString(i));
-	        	}
 	        }
 	        catch (JSONException e)
 	        {
@@ -196,7 +203,20 @@ public class EventCacher
 			}
 		}
 		
-		return eventHolder;
+		return fields;
+	}
+	
+	/**
+	 * 
+	 * @param imageName
+	 * @return
+	 */
+	public BitmapDrawable getCachedImage(String imageName)
+	{
+		//Get the image
+        File tempFile     = new File(getCachePath() + EventCacher.CACHE_MEDIA_DIR, imageName);
+        	
+        return new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
 	}
 	
 	/**

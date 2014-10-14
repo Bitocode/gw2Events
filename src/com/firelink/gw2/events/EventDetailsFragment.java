@@ -43,6 +43,7 @@ public class EventDetailsFragment extends Fragment
 	protected ImageView eventImageView;
 	
 	protected EventHolder eventHolder;
+	protected EventCacher ec;
 	
 	protected ProgressDialog eventDetailsDialog;
 	protected Activity activity;
@@ -84,6 +85,7 @@ public class EventDetailsFragment extends Fragment
 		sharedPrefsEditor.commit();
 		
 		eventHolder        = new EventHolder();
+		ec                 = new EventCacher(context);
 		eventDetailsDialog = new ProgressDialog(activity);
 		
 		Bundle bundle = getArguments();
@@ -224,7 +226,8 @@ public class EventDetailsFragment extends Fragment
 	 */
 	private void parseCache()
 	{
-		eventHolder = EventCacher.getEventCache(context, eventHolder.eventID);
+		eventHolder = ec.getEventJSONCache(eventHolder);
+		eventHolder.image = ec.getCachedImage(eventHolder.imageName);
 		
 		String startTimes = "";
     	for (int i = 0; i < eventHolder.startTimes.length; i++)

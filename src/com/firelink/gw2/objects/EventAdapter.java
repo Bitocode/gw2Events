@@ -241,7 +241,7 @@ public class EventAdapter extends BaseAdapter
 		
 		final long diff = temp.startTime.getTime() - date.getTime();
 		final long endDiff = temp.endTime.getTime() - date.getTime();
-		
+		if (diff >= 0) {
 			timer = new CountDownTimer(diff, 1000) {
 				
 				@Override
@@ -306,13 +306,9 @@ public class EventAdapter extends BaseAdapter
 		    		countDowns.get(index).start();
 				}
 			};
+		}
 		
 		return timer;
-    }
-    
-    protected void onInfCountdownTick(long diff)
-    {
-    	
     }
     
     /**
@@ -326,15 +322,28 @@ public class EventAdapter extends BaseAdapter
     	try {
 			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
     		date = sd.parse(sd.format(Calendar.getInstance().getTime()));
-			//date = sd.parse("01:14:55 PM");
+			//date = sd.parse("11:30:55 PM");
 		} catch (ParseException e) {}
     	
     	for (int i = 0; i < getCount(); i++) {
     		final EventHolder temp = getItem(i);
     		
-    		final long diff = temp.startTime.getTime() - date.getTime();
+    		final long diff;
+    		final long firstCheck = temp.startTime.getTime() - date.getTime();
     		
-    		if (diff >= -500) {
+    		if (firstCheck <= -(1000 * 60 * 15)) {
+    			Log.d("GW2Events", firstCheck + " Something");
+    			Calendar calendar = Calendar.getInstance();
+    			calendar.setTime(temp.startTime);
+    			calendar.add(Calendar.DAY_OF_YEAR, 1);
+    			temp.startTime = calendar.getTime();
+    			
+    			diff = firstCheck;//temp.startTime.getTime() - date.getTime();
+    		} else {
+    			diff = firstCheck;
+    		}
+    		
+    		if (diff >= -500 && !temp.isActive) {
     			CountDownTimer timer = new CountDownTimer(diff + 2000, 1000) {
 					
 					@Override
