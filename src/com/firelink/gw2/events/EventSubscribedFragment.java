@@ -1,5 +1,6 @@
 package com.firelink.gw2.events;
 
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import android.app.ActionBar;
@@ -125,7 +126,6 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 	@Override
     public void refresh()
     {
-        //Fix server name. Depends on size of the name
         setServerName();
         
         new DisplayData().execute();
@@ -158,7 +158,6 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
      */
     private void initEventView()
     {
-        //Fix server name. Depends on size of the name
         setServerName();
 
         if (eventAdapter == null) {
@@ -201,7 +200,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     /**
    	 * This caches our background data that we might use in the future
    	 */
-	public class DisplayData extends AsyncTask<Void, Void, EventAdapter> 
+	public class DisplayData extends AsyncTask<Void, Void, ArrayList<EventHolder>> 
 	{
 		@Override
 		protected void onPreExecute() 
@@ -211,11 +210,13 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 		}
 
 		@Override
-		protected EventAdapter doInBackground(Void... params) 
+		protected ArrayList<EventHolder> doInBackground(Void... params) 
 		{
 			SharedPreferences sharedPrefs = context.getSharedPreferences(
 					EventCacher.PREFS_NAME, 0);
-
+			
+			ArrayList<EventHolder> results = new ArrayList<EventHolder>();
+			
 			for (Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
 				EventHolder tempHolder = entry.getValue();
 
@@ -224,16 +225,20 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 				if (check == 1) {
 					tempHolder = ec.getEventJSONCache(tempHolder);
 
-					eventAdapter.add(tempHolder);
+					results.add(tempHolder);
 				}
 			}
 
-			return eventAdapter;
+			return results;
 		}
 
 		@Override
-		protected void onPostExecute(EventAdapter result) 
+		protected void onPostExecute(ArrayList<EventHolder> result) 
 		{
+			for (EventHolder holder : result) {
+				eventAdapter.add(holder);
+			}
+			
 			startCountdown();
 			eventListView.setAdapter(eventAdapter);
 		}

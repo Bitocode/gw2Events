@@ -2,15 +2,18 @@ package com.firelink.gw2.objects;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.support.v4.util.LongSparseArray;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +35,8 @@ public class EventAdapter extends BaseAdapter
     }
 
     private Context context;
-    private ArrayList<EventHolder> eventData;
-    private ArrayList<CountDownTimer> countDowns;
+    private SparseArray<EventHolder> eventData;
+    private HashMap<String, CountDownTimer> countDowns;
     private ChildFragmentInterface childFragInto;
 
     /**
@@ -45,8 +48,8 @@ public class EventAdapter extends BaseAdapter
         super();
 
         this.context   = context;
-        this.eventData = new ArrayList<EventHolder>();
-        countDowns = new ArrayList<CountDownTimer>();
+        this.eventData = new SparseArray<EventHolder>();
+        countDowns = new HashMap<String, CountDownTimer>();
     }
 
     /**
@@ -60,11 +63,11 @@ public class EventAdapter extends BaseAdapter
         super();
 
         this.context   = context;
-        this.eventData = new ArrayList<EventHolder>();
+        this.eventData = new SparseArray<EventHolder>();
 
         for (int i = 0; i < events.length; i++)
         {
-            this.eventData.add(events[i]);
+            this.eventData.put(i, events[i]);
         }
     }
 
@@ -76,7 +79,7 @@ public class EventAdapter extends BaseAdapter
      */
     public void add(EventHolder events)
     {
-        this.eventData.add(events);
+        this.eventData.put(getCount(), events);
 
         this.notifyDataSetChanged();
     }
@@ -214,26 +217,26 @@ public class EventAdapter extends BaseAdapter
 			//date = sd.parse("05:29:55 PM");
 		} catch (ParseException e) {}
     	
+    	organizeEvents(date);
+    	
     	for (int i = 0; i < getCount(); i++) {
-    		CountDownTimer timer = initCountdown(i, 0, date);
+    		final EventHolder temp = getItem(i);
+    		CountDownTimer timer = initCountdown(temp, 0, date);
     		
     		if (timer != null) {
-    			if (countDowns.size() > i) {
-    				countDowns.set(i, timer);
-    			} else {
-    				countDowns.add(timer);
-    			}
+    			countDowns.put(temp.eventID, timer);
     		}
     	}
 		
-		for (int i = 0; i < countDowns.size(); i++) {
-			countDowns.get(i).start();
+    	Iterator<String> i = countDowns.keySet().iterator();
+		while (i.hasNext()) {
+			String key = i.next();
+			countDowns.get(key).start();
 		}
     }
     
-    protected CountDownTimer initCountdown(final int index, final long offset, Date date)
+    protected CountDownTimer initCountdown(final EventHolder temp, final long offset, final Date date)
     {
-    	final EventHolder temp = getItem(index);
 		CountDownTimer timer = null;
 		
 		temp.startTime = temp.startTimes[EventHolder.getClosestDate(temp.startTimes, date)];
@@ -271,7 +274,6 @@ public class EventAdapter extends BaseAdapter
 						int minutes = (int)(millisUntilFinished / 1000) / 60 % 60;
 						int seconds = (int)(millisUntilFinished / 1000) % 60 % 60;
 						
-						Log.d("GW2Events", index + "");
 						//Display CountDown
 						temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
 					} else {
@@ -286,6 +288,8 @@ public class EventAdapter extends BaseAdapter
 					temp.isActive = true;
 					temp.countdownTimer = "Active";
 					
+					organizeEvents(date);
+					
 					Date date = new Date();
 			    	try {
 						SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
@@ -293,22 +297,54 @@ public class EventAdapter extends BaseAdapter
 					} catch (ParseException e) {}
 			    	
 			    	long offset = 1000 * 60 * 15;
-			    	CountDownTimer timer = initCountdown(index, offset, date);
+			    	CountDownTimer timer = initCountdown(temp, offset, date);
 		    		
 		    		if (timer != null) {
-		    			if (countDowns.size() > index) {
-		    				countDowns.set(index, timer);
-		    			} else {
-		    				countDowns.add(timer);
-		    			}
+		    			countDowns.put(temp.eventID, timer);
 		    		}
 		    		
-		    		countDowns.get(index).start();
+		    		countDowns.get(temp.eventID).start();
 				}
 			};
 		}
 		
 		return timer;
+    }
+    
+    private void organizeEvents(Date date)
+    {
+    	LongSparseArray<EventHolder> tempHolders = new LongSparseArray<EventHolder>();
+    	
+    	int numActive = 0;
+    	for (int i = 0; i < getCount(); i++) {
+    		EventHolder temp = eventData.get(i);
+    		
+    		temp.startTime = temp.startTimes[EventHolder.getClosestDate(temp.startTimes, date)];
+    		temp.endTime   = temp.endTimes[EventHolder.getClosestDate(temp.endTimes, date)];
+    		
+    		final long diff = temp.startTime.getTime() - date.getTime();
+    		final long endDiff = temp.endTime.getTime() - date.getTime();
+    		
+			if (diff > 0) {
+				if (endDiff < diff && endDiff > 0) {
+					EventHolder tempHolder = this.eventData.get(numActive);
+					this.eventData.append(numActive, temp);
+					this.eventData.append(i, tempHolder);
+					numActive++;
+				} else {
+					if (tempHolders.get(diff) == null) {
+						tempHolders.put(diff, temp);
+					} else {
+						tempHolders.put(diff + 1, temp);
+					}
+				}
+			}
+    	}
+    	
+    	for (int i = 0; i < tempHolders.size(); i++) {
+    		int key = numActive + i;
+    		this.eventData.append(key, tempHolders.get(tempHolders.keyAt(i)));
+    	}
     }
     
     /**
@@ -373,16 +409,16 @@ public class EventAdapter extends BaseAdapter
 					}
 				};
 				
-				countDowns.add(timer);
+				countDowns.put(i + "", timer);
     		} else {
     			temp.countdownTimer = "Active";
     		}
     	}
     	
-    	
-		
-		for (int i = 0; i < countDowns.size(); i++) {
-			countDowns.get(i).start();
+    	Iterator<String> i = countDowns.keySet().iterator();
+		while (i.hasNext()) {
+			String key = i.next();
+			countDowns.get(key).start();
 		}
     }
     
@@ -392,8 +428,10 @@ public class EventAdapter extends BaseAdapter
     public void stopCountdown()
     {
     	if (countDowns != null) {
-    		for (int i = 0; i < countDowns.size(); i++) {
-    			countDowns.get(i).cancel();
+    		Iterator<String> i = countDowns.keySet().iterator();
+    		while (i.hasNext()) {
+    			String key = i.next();
+    			countDowns.get(key).cancel();
     		}
     	}
     }
@@ -428,7 +466,7 @@ public class EventAdapter extends BaseAdapter
 
     public void setItem(int position, EventHolder event)
     {
-        eventData.set(position, event);
+        eventData.put(position, event);
     }
 }
 
