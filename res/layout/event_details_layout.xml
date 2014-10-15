@@ -13,40 +13,63 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:paddingBottom="5dp"
-            android:paddingLeft="0dp"
-            android:paddingRight="0dp"
             android:scaleType="fitXY"
             android:contentDescription="@string/the_specific_event_image" />
-
+    
+        <!-- Headers -->
         <TextView
-            android:id="@+id/eventDetailsView_descriptionTextView"
+            android:id="@+id/eventDetailsView_descriptionHeaderTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/eventDetailsView_eventImageView"
             android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:shadowColor="#000"
+            android:shadowDx="1"
+            android:shadowDy="-1"
+            android:shadowRadius="0.2"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/event_description" />
+        
+        <TextView
+            android:id="@+id/eventDetailsView_startTimesHeaderTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/eventDetailsView_descriptionTextView"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:shadowColor="#000"
+            android:shadowDx="1"
+            android:shadowDy="-1"
+            android:shadowRadius="0.2"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/event_times" />
+        
+        <!-- Details -->
+        <TextView
+            android:id="@id/eventDetailsView_descriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_descriptionHeaderTextView"
+            android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:gravity="center"
-            android:shadowColor="#FFF"
-            android:shadowDx="2"
-            android:shadowDy="-2"
-            android:shadowRadius="0.2"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/eventDetailsView_startTimesTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/eventDetailsView_descriptionTextView"
-            android:layout_marginRight="5dp"
+            android:layout_below="@id/eventDetailsView_startTimesHeaderTextView"
             android:gravity="center"
             android:shadowColor="#FFF"
-            android:shadowDx="2"
-            android:shadowDy="-2"
-            android:shadowRadius="0.2"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold" />

@@ -8,6 +8,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,19 +23,21 @@ import com.firelink.gw2.objects.RefreshInterface;
 
 public class EventSubscribedFragment extends Fragment implements RefreshInterface
 {
+	//High level fields
     protected Activity activity;
     protected Context context;
     protected Fragment fragment;
-
+    //Views
     protected ListView eventListView;
     protected ProgressDialog eventProgDialog;
     protected ActionBar actionBar;
-    protected SharedPreferences sharedPrefs;
-
+    //Custom data
     protected int serverID;
     protected String serverName;
     protected EventAdapter eventAdapter;
-
+    protected EventCacher ec;
+    
+    /** Some empty constructor */
     public EventSubscribedFragment(){}
     
     /** Called when the activity is first created. */
@@ -43,21 +46,27 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     {
         super.onCreate(savedInstanceState);
         
-        //Set actionbar stuff
-        actionBar = getActivity().getActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
-        
+        //Set the activity
         activity = getActivity();
         context  = getActivity().getApplicationContext();
         fragment = this;
         
-        //
-        sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
+        //Set ActionBar stuff
+        actionBar = activity.getActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        
+        //Preference
+        SharedPreferences sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
         serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
         serverName = sharedPrefs.getString(EventCacher.PREFS_SERVER_NAME, "Pizza");
+        
+        ec = new EventCacher(context);
+        
+        fragment.setRetainInstance(true);
     }
     
+    /** Called when the view is inflated */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) 
@@ -71,6 +80,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         return view;
     }
     
+    /** Called when the fragment resumes. */
     @Override
     public void onResume() 
     {
@@ -79,6 +89,30 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     	initEventView();
     }
     
+    /** Called when the fragment pauses. */
+    @Override
+    public void onPause() 
+    {
+    	stopCountdown();
+    	super.onPause();
+    }
+    /** Called when the fragment detaches. */
+    @Override
+    public void onDetach() 
+    {
+    	super.onDetach();
+    }
+    /** Called when the fragment is destroyed. */
+    @Override
+    public void onDestroy() 
+    {
+    	stopCountdown();
+    	super.onDestroy();
+    }
+    
+    /**
+     * Should this activity refresh upon reopening?
+     */
     @Override
     public boolean isRefreshOnOpen() 
     {
@@ -86,27 +120,35 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     }
     
     /**
-     * 
+     * Refreshes the data
      */
-    @Override
+	@Override
     public void refresh()
     {
         //Fix server name. Depends on size of the name
         setServerName();
-
-    	eventAdapter = new EventAdapter(context);
-    	SharedPreferences sharedPrefs = context.getSharedPreferences(EventCacher.PREFS_NAME, 0);
-		
-    	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
-    		EventHolder tempHolder = entry.getValue();
-    		
-			int check = sharedPrefs.getInt(tempHolder.eventID, 0);
-			
-			if (check == 1) {
-				eventAdapter.add(tempHolder.name, tempHolder.description, tempHolder.eventID, tempHolder.typeID);
-			}
+        
+        new DisplayData().execute();
+    }
+    
+    /**
+     * Initiates the CountDown sequence
+     */
+    private void startCountdown()
+    {
+    	if (eventAdapter != null) {
+    		eventAdapter.startInfiniteCountdown();
     	}
-        eventListView.setAdapter(eventAdapter);
+    }
+    
+    /**
+     * Stops the CountDown sequence
+     */
+    private void stopCountdown()
+    {
+    	if (eventAdapter != null) {
+    		eventAdapter.stopCountdown();
+    	}
     }
     
     /**
@@ -120,6 +162,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         setServerName();
 
         if (eventAdapter == null) {
+        	eventAdapter = new EventAdapter(context);
         	refresh();
         } else {
         	eventListView.setAdapter(eventAdapter);
@@ -154,4 +197,45 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
             ((HomeLayout)getActivity()).selectDetailItem(childFragment);
         }
     };
+    
+    /**
+   	 * This caches our background data that we might use in the future
+   	 */
+	public class DisplayData extends AsyncTask<Void, Void, EventAdapter> 
+	{
+		@Override
+		protected void onPreExecute() 
+		{
+			eventAdapter.stopCountdown();
+			eventAdapter.empty();
+		}
+
+		@Override
+		protected EventAdapter doInBackground(Void... params) 
+		{
+			SharedPreferences sharedPrefs = context.getSharedPreferences(
+					EventCacher.PREFS_NAME, 0);
+
+			for (Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
+				EventHolder tempHolder = entry.getValue();
+
+				int check = sharedPrefs.getInt(tempHolder.eventID, 0);
+
+				if (check == 1) {
+					tempHolder = ec.getEventJSONCache(tempHolder);
+
+					eventAdapter.add(tempHolder);
+				}
+			}
+
+			return eventAdapter;
+		}
+
+		@Override
+		protected void onPostExecute(EventAdapter result) 
+		{
+			startCountdown();
+			eventListView.setAdapter(eventAdapter);
+		}
+	}
 }

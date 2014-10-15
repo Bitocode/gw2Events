@@ -65,19 +65,22 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
     {
         super.onCreate(savedInstanceState);
         
-        //Set actionbar stuff
-        actionBar = getActivity().getActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
-        
+        //Set the activity
         activity = getActivity();
         context  = getActivity().getApplicationContext();
         fragment = this;
         
-        //
+        //Set ActionBar stuff
+        actionBar = activity.getActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+        
+        //Preference
         SharedPreferences sharedPrefs = activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 
         serverID   = sharedPrefs.getInt(EventCacher.PREFS_SERVER_ID, 0);
         serverName = sharedPrefs.getString(EventCacher.PREFS_SERVER_NAME, "Pizza");
+        
+        fragment.setRetainInstance(true);
     }
     
     /**
@@ -136,7 +139,6 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
     @Override
     public void refresh()
     {
-        //Fix server name. Depends on size of the name
         setServerName();
 
     	eventAdapter = new EventAdapter(context);
@@ -144,7 +146,7 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
     	for(Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
     		EventHolder tempHolder = entry.getValue();
     		
-    		eventAdapter.add(tempHolder.name, tempHolder.description, tempHolder.eventID, tempHolder.typeID);
+    		eventAdapter.add(tempHolder);
     	}
         eventListView.setAdapter(eventAdapter);
     }
@@ -210,7 +212,7 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 
 			//Create our database tables
 			String[] initialQueries = new String[1];
-			initialQueries[0] = "CREATE TABLE " + SQLHelper.TABLE_NAME_EVENT + " ( eventID VARCHAR(255) PRIMARY KEY, eventName VARCHAR(255), eventDescription VARCHAR(900), typeID INTEGER ) ";
+			initialQueries[0] = "CREATE TABLE " + SQLHelper.TABLE_NAME_EVENT + " ( eventID VARCHAR(255) PRIMARY KEY, eventName VARCHAR(255), eventDescription VARCHAR(900), eventType VARCHAR(900), typeID INTEGER ) ";
 			
 			SQLHelper sqlHelper	= new SQLHelper(context, initialQueries);
 			
@@ -237,11 +239,13 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 					String name 		 = URLDecoder.decode(jsonObject.getString("short_name"), "UTF-8");
                     String description   = URLDecoder.decode(jsonObject.getString("name"), "UTF-8");
                     String eventID       = URLDecoder.decode(jsonObject.getString("id"), "UTF-8");
+                    String eventType     = URLDecoder.decode(jsonObject.getString("event_class_name"), "UTF-8");
                     int typeID           = jsonObject.getInt("event_class_id");
 					
 					eventNameCV.put("eventID", eventID);
 					eventNameCV.put("eventName", name);
 					eventNameCV.put("eventDescription", description);
+					eventNameCV.put("eventType", eventType);
 					eventNameCV.put("typeID", typeID);
 					
 					try {
@@ -256,6 +260,9 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 				Log.d("GW2Events", e.getMessage());
 			}
 			
+			sqlHelper.close();
+			sqlWrite.close();
+			
 			return true;
 		}	
 	}
@@ -265,56 +272,56 @@ public class EventNamesFragment extends Fragment implements RefreshInterface
 	 */
 	public class DataCacher extends AsyncTask<Void, Void, String>
 	{
-		 @Override
-	        protected void onPreExecute()
-	        {
-	            super.onPreExecute();
-	        }
+		@Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
 
-	        @Override
-	        protected String doInBackground(Void...params)
-	        {
-	            String result = "";
-	            APICaller api = new APICaller();
+        @Override
+        protected String doInBackground(Void...params)
+        {
+            String result = "";
+            APICaller api = new APICaller();
 
-	            api.setAPI(APICaller.API_EVENT_DETAILS);
-	            api.setLanguage(APICaller.LANG_ENGLISH);
-	            api.setEventID("");
+            api.setAPI(APICaller.API_EVENT_DETAILS);
+            api.setLanguage(APICaller.LANG_ENGLISH);
+            api.setEventID("");
 
-	            if (api.callAPI()) {
-	                result = api.getJSONString();
-	            } else {
-	                result = api.getLastError();
-	            }
+            if (api.callAPI()) {
+                result = api.getJSONString();
+            } else {
+                result = api.getLastError();
+            }
 
-	            Log.d("GW2Events", result + "");
-	            
-	            try
-	            {
-	                EventCacher dCH = new EventCacher(context);
-	                
-	                JSONObject eventsObject = new JSONObject(result);
-	                eventsObject = eventsObject.getJSONObject("events");
-	                Iterator<?> iterator = eventsObject.keys();
-	                
-	                while (iterator.hasNext()) 
-	                {
-	                	String key = iterator.next().toString();
-	                	JSONObject eventObject = eventsObject.getJSONObject(key);
-	                	String imagePath       = eventObject.getString("imagePath");
-	                	String imageFileName   = eventObject.getString("imageFileName");
-	                	
-	                    dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.CACHE_MEDIA_DIR, imageFileName);
-	                    
-	                    dCH.cacheEventsAPI(eventObject.toString(), EventCacher.CACHE_APIS_DIR, key);
-	                }
-	            }
-	            catch (JSONException e)
-	            {
-	                Log.d("GW2Events", e.getMessage());
-	            }
+            Log.d("GW2Events", result + "");
+            
+            try
+            {
+                EventCacher dCH = new EventCacher(context);
+                
+                JSONObject eventsObject = new JSONObject(result);
+                eventsObject = eventsObject.getJSONObject("events");
+                Iterator<?> iterator = eventsObject.keys();
+                
+                while (iterator.hasNext()) 
+                {
+                	String key = iterator.next().toString();
+                	JSONObject eventObject = eventsObject.getJSONObject(key);
+                	String imagePath       = eventObject.getString("imagePath");
+                	String imageFileName   = eventObject.getString("imageFileName");
+                	
+                    dCH.cacheRemoteMedia(imagePath + imageFileName, EventCacher.CACHE_MEDIA_DIR, imageFileName);
+                    
+                    dCH.cacheEventsAPI(eventObject.toString(), EventCacher.CACHE_APIS_DIR, key);
+                }
+            }
+            catch (JSONException e)
+            {
+                Log.d("GW2Events", e.getMessage());
+            }
 
-	            return result;
-	        }
+            return result;
+        }
 	}
 }

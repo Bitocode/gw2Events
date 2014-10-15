@@ -12,5 +12,9 @@
     <string name="the_specific_event_image">The specific event image</string>
     <string name="drawer_open">Test Open</string>
     <string name="drawer_close">Test Close</string>
+    <string name="nothing">Nothing</string>
+    <string name="event_description">Event Description</string>
+    <string name="next_event_countdown">Next Event Countdown</string>
+    <string name="event_times">Event Times</string>
 
 </resources>
