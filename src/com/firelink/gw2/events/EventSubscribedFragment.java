@@ -101,6 +101,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     @Override
     public void onDetach() 
     {
+    	stopCountdown();
     	super.onDetach();
     }
     /** Called when the fragment is destroyed. */

@@ -23,6 +23,8 @@ public class EventHolder implements Cloneable
     public Date[] endTimes;
     public Date startTime;
     public Date endTime;
+    public long timeUntilNextStart;
+    public long timeUntilNextEnd;
     public String countdownTimer;
     public BitmapDrawable image;
     public int level;
@@ -49,6 +51,10 @@ public class EventHolder implements Cloneable
 		
 		for (int i = 0; i < dates.length; i++) {
 			
+			if (dates[i].getTime() == currDate.getTime()){
+				continue; 
+			}
+			
 			if (dates[i].getTime() >= maxDate) {
 				maxDate = dates[i].getTime();
 			} else {
@@ -68,7 +74,7 @@ public class EventHolder implements Cloneable
 				continue;
 			}
 			
-			if (min > diff || min < 0) {
+			if (min > diff || min <= 0) {
 				min = diff;
 				startIndex = i;
 			}
