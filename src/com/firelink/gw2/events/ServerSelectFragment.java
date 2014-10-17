@@ -10,14 +10,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,75 +31,88 @@ import android.widget.Toast;
 import com.firelink.gw2.objects.APICaller;
 import com.firelink.gw2.objects.EventCacher;
 
-public class WorldView extends Activity
+public class ServerSelectFragment extends Fragment
 {	
-	public String region;
-	public String selectedServer;
-	public Activity activity;
-	public Context context;
-	public SharedPreferences sharedPrefs;
-	public SharedPreferences.Editor sharedPrefsEditor;
-	public ArrayAdapter<String> adapterNA;
-	public ArrayAdapter<String> adapterEU;
-	public ListView lvServer;	
-	public Spinner regionSpinner;
-	public ProgressDialog progDialog;
-	public JSONArray json;
-	public HashMap<String, Integer> naServerID;
-	public HashMap<String, Integer> euServerID;
+	protected Activity activity;
+	protected Context context;
+	protected Fragment fragment;
+	
+	private String region;
+	private String selectedServer;
+	private JSONArray json;
+	
+	private SharedPreferences sharedPrefs;
+	private SharedPreferences.Editor sharedPrefsEditor;
+	
+	private ArrayAdapter<String> adapterNA;
+	private ArrayAdapter<String> adapterEU;
+	private HashMap<String, Integer> naServerID;
+	private HashMap<String, Integer> euServerID;
+	
+	private ListView lvServer;	
+	private Spinner regionSpinner;
+	private ProgressDialog progDialog;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.world_view_layout);
         
-		//Set actionbar stuff
-        getActionBar().setTitle("Select World");
-        getActionBar().setDisplayShowTitleEnabled(true);
+        activity 	= getActivity();
+        context 	= activity.getApplicationContext();
+        fragment    = this;
+        
+		//Set ActionBar stuff
+        activity.getActionBar().setTitle("Select World");
+        activity.getActionBar().setDisplayShowTitleEnabled(true);
 		
         //Initialize globals
         selectedServer = "";
-        
-        context 	= this;
-        activity 	= this;
-    
-        
-        lvServer 		= (ListView)findViewById(R.id.worldView_serverListView);
-		adapterNA	 	= new ArrayAdapter<String>(this, R.layout.world_view_serverlist_textview);
-		adapterEU	 	= new ArrayAdapter<String>(this, R.layout.world_view_serverlist_textview);
+        adapterNA	 	= new ArrayAdapter<String>(activity, R.layout.server_select_serverlist_textview);
+		adapterEU	 	= new ArrayAdapter<String>(activity, R.layout.server_select_serverlist_textview);
 		naServerID 		= new HashMap<String, Integer>();
 		euServerID		= new HashMap<String, Integer>();
 		
 		//Preferences
-		sharedPrefs 		= getSharedPreferences(EventCacher.PREFS_NAME, 0);
+		sharedPrefs 		= activity.getSharedPreferences(EventCacher.PREFS_NAME, 0);
 		sharedPrefsEditor 	= sharedPrefs.edit();
-	
+		
+		fragment.setRetainInstance(true);
+    }
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+    		Bundle savedInstanceState) 
+    {
+    	View view = inflater.inflate(R.layout.server_select_layout, container, false);
+    	
+		//Initialize the ListView
+    	lvServer 		= (ListView)view.findViewById(R.id.worldView_serverListView);
+		lvServer.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		lvServer.setOnItemClickListener(lvServerHandler);
+    	
         //Initialize the spinner
+		regionSpinner = (Spinner)view.findViewById(R.id.worldView_serverRegionSpinner);
+		//Set the data
         ArrayList<String> regionList = new ArrayList<String>();
         regionList.add("Select One");
         regionList.add("North America");
         regionList.add("Europe");
-        
-        ArrayAdapter<String> regionSpinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, regionList);
+        //Add to ArrayAdapter
+    	ArrayAdapter<String> regionSpinnerAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, regionList);
         regionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        
-		regionSpinner = (Spinner)findViewById(R.id.worldView_serverRegionSpinner);
+    	//Add to spinner
 		regionSpinner.setAdapter(regionSpinnerAdapter);
 		regionSpinner.setOnItemSelectedListener(regionSpinnerSelector);
-		
-		//Initialize the ListView
-		lvServer.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		
-		lvServer.setOnItemClickListener(lvServerHandler);
-		
+
 		//Initialize the server select button
-		Button serverSelectButton = (Button)findViewById(R.id.worldView_serverSelectButton);
-		
+		Button serverSelectButton = (Button)view.findViewById(R.id.worldView_serverSelectButton);
 		serverSelectButton.setOnClickListener(serverSelectButtonHandler);
-		
+    	
+    	return view;
     }
+    
     
     /**
      * Handler for the region spinner
@@ -170,13 +185,6 @@ public class WorldView extends Activity
 			sharedPrefsEditor.apply();
 			
 			Toast.makeText(context, "Server ID Saved", Toast.LENGTH_LONG).show();
-			
-			Intent returnIntent = new Intent();
-			returnIntent.putExtra("serverName", selectedServer);
-			returnIntent.putExtra("serverID", selectedServerID);
-			setResult(RESULT_OK, returnIntent);
-			
-			finish();
 		}
 	};
 

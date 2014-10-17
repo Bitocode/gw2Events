@@ -16,5 +16,6 @@
     <string name="event_description">Event Description</string>
     <string name="next_event_countdown">Next Event Countdown</string>
     <string name="event_times">Event Times</string>
+    <string name="something_happened_">Something happened...</string>
 
 </resources>

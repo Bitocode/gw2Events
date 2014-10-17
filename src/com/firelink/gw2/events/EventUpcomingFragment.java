@@ -239,7 +239,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
         protected void onPreExecute()
         {
             super.onPreExecute();
-            refreshLayout.setRefreshing(true);
+            //refreshLayout.setRefreshing(true);
             
             stopCountdown();
             
@@ -287,7 +287,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
 	        		temp.isActive  = isActive;
 	        		 
                     //Add to adapter at some point
-                    eventAdapter.add(temp);
+                    eventAdapter.addWithoutNotify(temp);
                 }
             }
             catch (JSONException e)
@@ -300,7 +300,6 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
 			}
 
             //Reset adapter
-            eventListView.setAdapter(null);
             eventListView.setAdapter(eventAdapter);
             startCountdown();
 

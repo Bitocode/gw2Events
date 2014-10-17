@@ -107,6 +107,18 @@ public class EventAdapter extends BaseAdapter
         this.notifyDataSetChanged();
     }
     
+    /**
+     * 
+     * @param events
+     */
+    public void addWithoutNotify(EventHolder events)
+    {
+    	this.eventData.put(getCount(), events);
+    }
+    
+    /**
+     * 
+     */
     public void empty()
     {
     	this.eventData.clear();

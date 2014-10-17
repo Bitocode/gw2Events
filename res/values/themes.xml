@@ -4,6 +4,12 @@
     <style name="CustomActionBarTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:homeAsUpIndicator">@drawable/customhomenav</item>
+        <item name="android:spinnerItemStyle">@style/Spinner.Dark</item>
+    </style>
+    
+    <!-- SpinnerItem Style -->
+    <style name="Spinner.Dark" parent="@android:style/TextAppearance.Widget.TextView.SpinnerItem" >
+        <item name="android:textColor">#000</item>
     </style>
     
     <!-- ActionBar styles -->

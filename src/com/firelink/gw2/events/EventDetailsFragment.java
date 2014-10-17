@@ -1,22 +1,13 @@
 package com.firelink.gw2.events;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,12 +17,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.firelink.gw2.objects.APICaller;
 import com.firelink.gw2.objects.ChildFragmentInterface;
 import com.firelink.gw2.objects.EventCacher;
 import com.firelink.gw2.objects.EventHolder;
+import com.firelink.gw2.objects.TaskCompletedInterface;
 
-public class EventDetailsFragment extends Fragment
+public class EventDetailsFragment extends Fragment implements TaskCompletedInterface
 {
 	private SharedPreferences sharedPrefs;
 	private SharedPreferences.Editor sharedPrefsEditor;
@@ -41,6 +32,7 @@ public class EventDetailsFragment extends Fragment
 	protected TextView startTimesTextView;
 	protected TextView[] headersTextView;
 	protected ImageView eventImageView;
+	protected TextView errorTextView;
 	
 	protected EventHolder eventHolder;
 	protected EventCacher ec;
@@ -48,6 +40,7 @@ public class EventDetailsFragment extends Fragment
 	protected ProgressDialog eventDetailsDialog;
 	protected Activity activity;
 	protected Context context;
+	protected Fragment fragment;
 	
 	public EventDetailsFragment(){}
 	
@@ -75,6 +68,7 @@ public class EventDetailsFragment extends Fragment
 		
 		activity = getActivity();
 		context  = getActivity().getApplicationContext();
+		fragment = this;
 		
 		//Set ActionBar stuff
 		activity.getActionBar().setDisplayShowTitleEnabled(true);
@@ -116,6 +110,7 @@ public class EventDetailsFragment extends Fragment
 		
 		descriptionTextView = (TextView)view.findViewById(R.id.eventDetailsView_descriptionTextView);
 		startTimesTextView  = (TextView)view.findViewById(R.id.eventDetailsView_startTimesTextView);
+		errorTextView       = (TextView)view.findViewById(R.id.eventDetailsView_errorView);
 		eventImageView      = (ImageView)view.findViewById(R.id.eventDetailsView_eventImageView);
 		
 		parseCache();
@@ -193,6 +188,41 @@ public class EventDetailsFragment extends Fragment
 	
 	/**
 	 * 
+	 */
+	@Override
+	public void onTaskCompleted() 
+	{
+		eventDetailsDialog.dismiss();
+		parseCache();
+	}
+	/**
+	 * 
+	 */
+	@Override
+	public void onTaskCompletedWIthErrors(String message) 
+	{
+		eventDetailsDialog.dismiss();
+		errorTextView.setText(message);
+		errorTextView.setVisibility(View.VISIBLE);
+		
+		View view = (View) errorTextView.getParent().getParent();
+		
+		errorTextView.setHeight(view.getHeight());
+		errorTextView.setGravity(Gravity.CENTER);
+	}
+	
+	private void recacheEvent()
+	{
+		ec.cacheEventDetails(eventHolder.eventID, (TaskCompletedInterface)fragment);
+		eventDetailsDialog.setMessage("Retrieving event details...");
+		eventDetailsDialog.setIndeterminate(false);
+		eventDetailsDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		eventDetailsDialog.setCancelable(false);
+		eventDetailsDialog.show();
+	}
+	
+	/**
+	 * 
 	 * @param item
 	 */
 	private void toggleSubscribe()
@@ -226,110 +256,48 @@ public class EventDetailsFragment extends Fragment
 	 */
 	private void parseCache()
 	{
-		eventHolder = ec.getEventJSONCache(eventHolder);
-		eventHolder.image = ec.getCachedImage(eventHolder.imageName);
+		EventHolder tempEvent = ec.getEventJSONCache(eventHolder);
 		
-		String startTimes = "";
-    	for (int i = 0; i < eventHolder.startTimes.length; i++)
-    	{
-    		//Print it
-    		startTimes = startTimes.concat(EventHolder.formatDateToTime(eventHolder.startTimes[i]) + "\n");
+		if (tempEvent == null) {
+			recacheEvent();
+		} else {
+			eventHolder = ec.getEventJSONCache(eventHolder);
+			eventHolder.image = ec.getCachedImage(eventHolder.imageName);
+			String startTimes = "";
+	    	for (int i = 0; i < eventHolder.startTimes.length; i++)
+	    	{
+	    		//Print it
+	    		startTimes = startTimes.concat(EventHolder.formatDateToTime(eventHolder.startTimes[i]) + "\n");
 
-    		Log.d("GW2Events", i + ": " + EventHolder.formatDateToTime(eventHolder.startTimes[i]));
-    	}
-    	
-    	//Set our views
-    	//Determine which color to add to the eventClass left bar thing
-        int eventColor;
-        switch(eventHolder.typeID)
-        {
-            case 1:
-            	eventColor      = R.color.gw_event_level_high;
-                break;
-            case 2:
-            	eventColor      = R.color.gw_event_level_standard;
-                break;
-            case 3:
-            	eventColor      = R.color.gw_event_level_low;
-                break;
-            default:
-            	eventColor      = R.color.gw_event_level_standard;
-                break;
-        }
-        
-        for(int i = 0; i < headersTextView.length; i++) {
-        	headersTextView[i].setBackgroundColor(context.getResources().getColor(eventColor));
-        }
-        
-    	eventImageView.setImageDrawable(eventHolder.image);
-    	descriptionTextView.setText(eventHolder.description);
-    	startTimesTextView.setText(startTimes);
+	    		Log.d("GW2Events", i + ": " + EventHolder.formatDateToTime(eventHolder.startTimes[i]));
+	    	}
+	    	
+	    	//Set our views
+	    	//Determine which color to add to the eventClass left bar thing
+	        int eventColor;
+	        switch(eventHolder.typeID)
+	        {
+	            case 1:
+	            	eventColor      = R.color.gw_event_level_high;
+	                break;
+	            case 2:
+	            	eventColor      = R.color.gw_event_level_standard;
+	                break;
+	            case 3:
+	            	eventColor      = R.color.gw_event_level_low;
+	                break;
+	            default:
+	            	eventColor      = R.color.gw_event_level_standard;
+	                break;
+	        }
+	        
+	        for(int i = 0; i < headersTextView.length; i++) {
+	        	headersTextView[i].setBackgroundColor(context.getResources().getColor(eventColor));
+	        }
+	        
+	    	eventImageView.setImageDrawable(eventHolder.image);
+	    	descriptionTextView.setText(eventHolder.description);
+	    	startTimesTextView.setText(startTimes);
+		}
 	}
-	
-	 /**
-     * This is the class for making our API call to retrieve the event contents.
-     */
-    public class EventDetailsAPI extends AsyncTask<Void, Void, String>
-    {
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-            
-            eventDetailsDialog.setMessage("Retrieving event details...");
-            eventDetailsDialog.setIndeterminate(false);
-            eventDetailsDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            eventDetailsDialog.setCancelable(false);
-            eventDetailsDialog.show();
-        }
-
-        @Override
-        protected String doInBackground(Void...params)
-        {
-            String result = "";
-            APICaller api = new APICaller();
-
-            api.setAPI(APICaller.API_EVENT_DETAILS);
-            api.setLanguage(APICaller.LANG_ENGLISH);
-            api.setEventID(eventHolder.eventID);
-
-            if (api.callAPI()) {
-                result = api.getJSONString();
-            } else {
-                result = api.getLastError();
-            }
-
-            Log.d("GW2Events", result + "");
-            
-            try
-            {
-            	JSONObject eventObject = new JSONObject(result);
-            	eventObject = eventObject.getJSONObject("events").getJSONObject(eventHolder.eventID);
-                
-            	eventHolder.description = URLDecoder.decode(eventObject.getString("description"), "UTF-8");
-                eventHolder.imageName = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
-                
-                EventCacher tempCacher = new EventCacher(context);
-        		File tempFile = new File(tempCacher.getCachePath() + EventCacher.CACHE_MEDIA_DIR, eventHolder.imageName);
-            	eventHolder.image = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
-            }
-            catch (JSONException e)
-            {
-                Log.d("GW2Events", e.getMessage());
-            } catch (UnsupportedEncodingException e) {
-				Log.d("GW2Events", e.getMessage());
-			}
-
-            return result;
-        }
-
-        @Override
-        public void onPostExecute(String result)
-        {
-        	descriptionTextView.setText(eventHolder.description);
-            eventImageView.setImageDrawable(eventHolder.image);
-            
-            eventDetailsDialog.dismiss();
-        }
-    }
 }

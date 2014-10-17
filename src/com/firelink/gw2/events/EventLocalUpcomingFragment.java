@@ -25,7 +25,7 @@ import com.firelink.gw2.objects.EventHolder;
 import com.firelink.gw2.objects.RefreshInterface;
 import com.firelink.gw2.objects.TaskCompletedInterface;
 
-public class EventSubscribedFragment extends Fragment implements RefreshInterface, TaskCompletedInterface
+public class EventLocalUpcomingFragment extends Fragment implements RefreshInterface, TaskCompletedInterface
 {
 	//High level fields
     protected Activity activity;
@@ -43,7 +43,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     protected EventCacher ec;
     
     /** Some empty constructor */
-    public EventSubscribedFragment(){}
+    public EventLocalUpcomingFragment(){}
     
     /** Called when the activity is first created. */
     @Override
@@ -232,8 +232,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
      */
     private void setServerName()
     {
-        actionBar.setTitle("Subscribed Events");
-        actionBar.setSubtitle(null);
+        actionBar.setTitle("Upcoming Events");
+        actionBar.setSubtitle("2 hours");
     }
 
     AdapterView.OnItemClickListener eventSelectAdapterView = new AdapterView.OnItemClickListener()
@@ -275,28 +275,21 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 
 		@Override
 		protected ArrayList<EventHolder> doInBackground(Void... params) 
-		{
-			SharedPreferences sharedPrefs = context.getSharedPreferences(
-					EventCacher.PREFS_NAME, 0);
-			
+		{			
 			ArrayList<EventHolder> results = new ArrayList<EventHolder>();
 			
 			for (Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
 				EventHolder eventHolder = entry.getValue();
 
-				int check = sharedPrefs.getInt(eventHolder.eventID, 0);
-
-				if (check == 1) {
-					EventHolder tempHolder = ec.getEventJSONCache(eventHolder);
-					
-					if (tempHolder == null) {
-						ec.cacheEventDetails(eventHolder.eventID, (TaskCompletedInterface) fragment);
-						cancel(true);
-						break;
-					}
-					
-					results.add(tempHolder);
+				EventHolder tempHolder = ec.getEventJSONCache(eventHolder);
+				
+				if (tempHolder == null) {
+					ec.cacheEventDetails(eventHolder.eventID, (TaskCompletedInterface) fragment);
+					cancel(true);
+					break;
 				}
+				
+				results.add(tempHolder);
 			}
 
 			return results;

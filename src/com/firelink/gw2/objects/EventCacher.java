@@ -83,6 +83,12 @@ public class EventCacher
     	return cachePath + File.separator;
     }
 	
+	public boolean checkCache()
+	{
+		//return if there is a valid cache
+		return false;
+	}
+	
 	/**
 	 * 
 	 * @param forSub
@@ -201,6 +207,8 @@ public class EventCacher
 	        } catch (UnsupportedEncodingException e) {
 				Log.d("GW2Events", e.getMessage());
 			}
+		} else {
+			fields = null;
 		}
 		
 		return fields;
@@ -214,9 +222,18 @@ public class EventCacher
 	public BitmapDrawable getCachedImage(String imageName)
 	{
 		//Get the image
-        File tempFile     = new File(getCachePath() + EventCacher.CACHE_MEDIA_DIR, imageName);
+		BitmapDrawable bd = null;
+		
+		try {
+			File tempFile     = new File(getCachePath() + EventCacher.CACHE_MEDIA_DIR, imageName);
         	
-        return new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+	        bd = new BitmapDrawable(context.getResources(), BitmapFactory.decodeFile(tempFile.getAbsolutePath()));
+		} catch(Exception e) {
+			Log.d("GW2Events", e.getMessage());
+		}
+		
+		return bd;
+        
 	}
 	
 	/**
@@ -234,6 +251,15 @@ public class EventCacher
 		}
 		
 		new CacheMediaTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, source, path, fileName);
+	}
+	
+	/**
+	 * 
+	 * @param eventID
+	 */
+	public void cacheEventDetails(String eventID, TaskCompletedInterface theInterface) {
+		Log.d("GW2Events", "Caching " + eventID);
+		new EventDetailsAPI(theInterface).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, eventID);
 	}
 	
 	/**
@@ -260,6 +286,92 @@ public class EventCacher
 				
 		
 	}
+	
+	 /**
+     * This is the class for making our API call to retrieve the event contents.
+     */
+    public class EventDetailsAPI extends AsyncTask<String, Void, String>
+    {
+    	private TaskCompletedInterface listener;
+    	private boolean isError;
+    	
+    	public EventDetailsAPI(TaskCompletedInterface listener)
+    	{
+    		if (listener != null) {
+    			this.listener = listener;
+    		}
+    		
+    		isError = false;
+    	}
+    	
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String...params)
+        {
+            String result = "";
+            APICaller api = new APICaller();
+
+            api.setAPI(APICaller.API_EVENT_DETAILS);
+            api.setLanguage(APICaller.LANG_ENGLISH);
+            api.setEventID(params[0]);
+
+            if (api.callAPI()) {
+                result = api.getJSONString();
+            } else {
+                result = api.getLastError();
+            }
+
+            Log.d("GW2Events", result + "");
+            
+            try
+            {
+            	JSONObject eventObject = new JSONObject(result);
+            	
+            	eventObject = eventObject.getJSONObject("events").getJSONObject(params[0]);
+            	
+            	String imagePath = URLDecoder.decode(eventObject.getString("imagePath"), "UTF-8");
+            	String imageFileName = URLDecoder.decode(eventObject.getString("imageFileName"), "UTF-8");
+                
+            	cacheRemoteMedia(imagePath + imageFileName, EventCacher.CACHE_MEDIA_DIR, imageFileName);
+            	cacheEventsAPI(eventObject.toString(), EventCacher.CACHE_APIS_DIR, params[0]);
+            	
+            	BitmapDrawable test = getCachedImage(imageFileName);
+            	
+            	while (test.getBitmap() == null) {
+            		test = getCachedImage(imageFileName);
+            	}
+            }
+            catch (JSONException e)
+            {
+                Log.d("GW2Events", e.getMessage());
+                result  = "Unable to contact server. Try again later";
+                isError = true;
+            } catch (UnsupportedEncodingException e) {
+				Log.d("GW2Events", e.getMessage());
+				result  = "Unable to contact server. Try again later";
+				isError = true;
+			}
+
+            return result;
+        }
+
+        @Override
+        public void onPostExecute(String result)
+        {
+        	if (listener != null) {
+        		if (isError) {
+        			listener.onTaskCompletedWIthErrors(result);
+        		} else {
+        			listener.onTaskCompleted();
+        		}
+        	}
+        }
+    }
 	
 	
 	/**
