@@ -30,9 +30,23 @@ import android.widget.Toast;
 
 import com.firelink.gw2.objects.APICaller;
 import com.firelink.gw2.objects.EventCacher;
+import com.firelink.gw2.objects.ServerSelectedInterface;
 
+/**
+ * This class is responsible for selecting which server the user belongs to in GW2
+ * Knowing the server the user uses has no impact on any of the actual data being
+ * represented to the user. It used to matter, but is now used by me for data 
+ * collection and possible analysis. 
+ * 
+ * @author Justin Smith <bitocode@gmail.com>
+ *
+ */
 public class ServerSelectFragment extends Fragment
 {	
+	private final static String SELECT_WORLD  = "Select World";
+	private final static String NORTH_AMERICA = "North America";
+	private final static String EUROPE        = "Europe";
+	
 	protected Activity activity;
 	protected Context context;
 	protected Fragment fragment;
@@ -49,9 +63,26 @@ public class ServerSelectFragment extends Fragment
 	private HashMap<String, Integer> naServerID;
 	private HashMap<String, Integer> euServerID;
 	
+	private ServerSelectedInterface serverSelectInterface;
+	
 	private ListView lvServer;	
 	private Spinner regionSpinner;
 	private ProgressDialog progDialog;
+	private Button serverSelectButton;
+	
+	/** Called when the activity is attached */
+	@Override
+	public void onAttach(Activity activity) 
+	{
+		super.onAttach(activity);
+		
+		try {
+			serverSelectInterface = (ServerSelectedInterface)activity;
+		} catch (ClassCastException e) {
+			Log.d("GW2Events", e.getMessage());
+		}
+		
+	}
 	
     /** Called when the activity is first created. */
     @Override
@@ -64,7 +95,7 @@ public class ServerSelectFragment extends Fragment
         fragment    = this;
         
 		//Set ActionBar stuff
-        activity.getActionBar().setTitle("Select World");
+        activity.getActionBar().setTitle(SELECT_WORLD);
         activity.getActionBar().setDisplayShowTitleEnabled(true);
 		
         //Initialize globals
@@ -96,9 +127,9 @@ public class ServerSelectFragment extends Fragment
 		regionSpinner = (Spinner)view.findViewById(R.id.worldView_serverRegionSpinner);
 		//Set the data
         ArrayList<String> regionList = new ArrayList<String>();
-        regionList.add("Select One");
-        regionList.add("North America");
-        regionList.add("Europe");
+        regionList.add(SELECT_WORLD);
+        regionList.add(NORTH_AMERICA);
+        regionList.add(EUROPE);
         //Add to ArrayAdapter
     	ArrayAdapter<String> regionSpinnerAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, regionList);
         regionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -107,8 +138,9 @@ public class ServerSelectFragment extends Fragment
 		regionSpinner.setOnItemSelectedListener(regionSpinnerSelector);
 
 		//Initialize the server select button
-		Button serverSelectButton = (Button)view.findViewById(R.id.worldView_serverSelectButton);
+		serverSelectButton = (Button)view.findViewById(R.id.worldView_serverSelectButton);
 		serverSelectButton.setOnClickListener(serverSelectButtonHandler);
+		serverSelectButton.setVisibility(View.GONE);
     	
     	return view;
     }
@@ -119,19 +151,30 @@ public class ServerSelectFragment extends Fragment
      */
     AdapterView.OnItemSelectedListener regionSpinnerSelector = new AdapterView.OnItemSelectedListener() {
     	
+    	/**
+    	 * 
+    	 */
     	@Override
 		public void onItemSelected(AdapterView<?> arg0, View arg1,
 				int arg2, long arg3) {
 			
-			region = ((TextView)arg1).getText().toString();
+			String newRegion = ((TextView)arg1).getText().toString();
 			
-			if(region == "North America"){
+			if (region == newRegion) {
+				return;
+			}
+			
+			region = newRegion;
+			
+			serverSelectButton.setVisibility(View.GONE);
+			
+			if(NORTH_AMERICA == region){
 				if(adapterNA.isEmpty()){
 					new ServerSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				} else {
 					lvServer.setAdapter(adapterNA);
 				}
-			} else if (region == "Europe"){
+			} else if (EUROPE == region){
 				if(adapterEU.isEmpty()){
 					new ServerSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				} else {
@@ -140,7 +183,6 @@ public class ServerSelectFragment extends Fragment
 			} else {
 				lvServer.setAdapter(null);
 			}
-	
 		}
 
 		@Override
@@ -159,6 +201,7 @@ public class ServerSelectFragment extends Fragment
 			
 			TextView lvTextView = (TextView)arg1;
 			selectedServer = lvTextView.getText().toString();
+			serverSelectButton.setVisibility(View.VISIBLE);
 
 		}
 	
@@ -174,9 +217,9 @@ public class ServerSelectFragment extends Fragment
 			
 			int selectedServerID = 0;
 			
-			if(region == "North America"){
+			if(NORTH_AMERICA == region){
 				selectedServerID = naServerID.get(selectedServer);
-			} else if (region == "Europe"){
+			} else if (EUROPE == region){
 				selectedServerID = euServerID.get(selectedServer);
 			}
 			
@@ -185,6 +228,10 @@ public class ServerSelectFragment extends Fragment
 			sharedPrefsEditor.apply();
 			
 			Toast.makeText(context, "Server ID Saved", Toast.LENGTH_LONG).show();
+			
+			if (null != serverSelectInterface) {
+				serverSelectInterface.onServerSelected();
+			}
 		}
 	};
 
@@ -198,7 +245,7 @@ public class ServerSelectFragment extends Fragment
 		{
 			super.onPreExecute();
 			
-			if(region == "Select One"){
+			if(SELECT_WORLD == region){
 				return;
 			}
 			
@@ -212,7 +259,7 @@ public class ServerSelectFragment extends Fragment
 	
 		protected String doInBackground(Void...params)
 		{
-			if(region == "Select One"){
+			if(SELECT_WORLD == region){
 				return null;
 			}
 			
@@ -232,7 +279,7 @@ public class ServerSelectFragment extends Fragment
 
 		public void onPostExecute(String result)
 		{
-			if(region == "Select One"){
+			if(SELECT_WORLD == region){
 				return;
 			}
 			
@@ -247,12 +294,12 @@ public class ServerSelectFragment extends Fragment
 					int value 				= jsonObject.getInt("id");
 					
 					
-					if(region == "North America"){
+					if(NORTH_AMERICA == region){
 						if(value < 2000){
 							adapterNA.add(key);
 							naServerID.put(key, value);
 						}
-					} else if (region == "Europe"){
+					} else if (EUROPE == region){
 						if(value >= 2000){
 							adapterEU.add(key);
 							euServerID.put(key, value);
@@ -268,7 +315,7 @@ public class ServerSelectFragment extends Fragment
 			}
 			
 			lvServer.setAdapter(null);
-			if(region == "North America"){
+			if(NORTH_AMERICA == region){
 				lvServer.setAdapter(adapterNA);
 			} else {
 				lvServer.setAdapter(adapterEU);

@@ -29,6 +29,7 @@ public class EventHolder implements Cloneable
     public BitmapDrawable image;
     public int level;
     public int typeID;
+    public int indexOffset;
     public boolean isActive;
     
     @Override

@@ -1,6 +1,7 @@
 package com.firelink.gw2.events;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map.Entry;
 
 import android.app.ActionBar;
@@ -22,10 +23,11 @@ import android.widget.TextView;
 import com.firelink.gw2.objects.EventAdapter;
 import com.firelink.gw2.objects.EventCacher;
 import com.firelink.gw2.objects.EventHolder;
+import com.firelink.gw2.objects.EventUpdateInterface;
 import com.firelink.gw2.objects.RefreshInterface;
 import com.firelink.gw2.objects.TaskCompletedInterface;
 
-public class EventSubscribedFragment extends Fragment implements RefreshInterface, TaskCompletedInterface
+public class EventSubscribedFragment extends Fragment implements RefreshInterface, TaskCompletedInterface, EventUpdateInterface
 {
 	//High level fields
     protected Activity activity;
@@ -151,6 +153,31 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
         
         new DisplayData().execute();
     }
+	
+	/***************************************************
+     *************************************************** 
+     *	Start of RefreshInterface methods
+     ***************************************************
+     ***************************************************/
+	
+	/**
+	 *
+	 * @param holder
+	 * @param date
+	 * @return EventHolder
+	 */
+	@Override
+	public EventHolder updateStartAndEndTimes(EventHolder holder, Date date) 
+	{
+		if (holder.indexOffset > 0) {
+			//Do something else
+		} else {
+			holder.startTime = holder.startTimes[EventHolder.getClosestDate(holder.startTimes, date)];
+			holder.endTime = holder.endTimes[EventHolder.getClosestDate(holder.endTimes, date)];
+		}
+		
+		return holder;
+	}
     
 	/***************************************************
      *************************************************** 
@@ -218,6 +245,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 
         if (eventAdapter == null) {
         	eventAdapter = new EventAdapter(context);
+        	eventAdapter.setEventUpdateInterface((EventUpdateInterface)fragment);
         	refresh();
         } else {
         	eventListView.setAdapter(eventAdapter);

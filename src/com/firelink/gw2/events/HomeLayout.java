@@ -311,8 +311,17 @@ public class HomeLayout extends Activity implements ChildFragmentInterface, Serv
 	@Override
 	public void onServerSelected() 
 	{
-
+		selectItem(0);
+		jDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
 	}
+	
+	/***************************************************
+     *************************************************** 
+     *	Start of HomeLayout-specific methods
+     ***************************************************
+     ***************************************************/
 	
 	/**
 	 * 
@@ -329,7 +338,6 @@ public class HomeLayout extends Activity implements ChildFragmentInterface, Serv
 		}
 		
 	}
-	
 	/**
 	 * 
 	 */
@@ -341,7 +349,6 @@ public class HomeLayout extends Activity implements ChildFragmentInterface, Serv
 			jDrawerToggle.setDrawerIndicatorEnabled(false);
 		}
 	}
-	
 	/**
 	 * 
 	 * @param position
@@ -369,11 +376,9 @@ public class HomeLayout extends Activity implements ChildFragmentInterface, Serv
 			Log.d("GW2Events", e.getMessage());
 		}
 	}
-	
 	/**
 	 * 
 	 * @param fragment
-	 * @param callingFragment
 	 */
 	public void selectDetailItem(Fragment fragment)
 	{	
@@ -386,6 +391,12 @@ public class HomeLayout extends Activity implements ChildFragmentInterface, Serv
         //Commit
         tFrag.commit();
 	}
+	
+	/***************************************************
+     *************************************************** 
+     *	Start of HomeLayout-specific Classes
+     ***************************************************
+     ***************************************************/
 	
 	/**
 	 * This caches our background data that we might use in the future

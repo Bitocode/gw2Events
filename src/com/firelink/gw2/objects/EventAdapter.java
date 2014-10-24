@@ -44,6 +44,7 @@ public class EventAdapter extends BaseAdapter
     private SparseArray<EventHolder> eventData;
     private HashMap<String, CountDownTimer> countDowns;
     private ChildFragmentInterface childFragInto;
+    private EventUpdateInterface eventUpdateInterface;
     private Runnable mRunnable;
     private Handler mHandler;
     private Date currentTime;
@@ -135,6 +136,11 @@ public class EventAdapter extends BaseAdapter
 		} catch (ClassCastException e) {
 			Log.d("GW2Events", e.getMessage());
 		}
+    }
+    
+    public void setEventUpdateInterface(EventUpdateInterface eui)
+    {
+    	eventUpdateInterface = eui;
     }
 
     /**
@@ -261,9 +267,6 @@ public class EventAdapter extends BaseAdapter
     		if (temp.startTimes == null) {
     			return;
     		}
-    		
-    		temp.startTime = temp.startTimes[EventHolder.getClosestDate(temp.startTimes, date)];
-    		temp.endTime   = temp.endTimes[EventHolder.getClosestDate(temp.endTimes, date)];
     		
     		final long diff = temp.startTime.getTime() - date.getTime();
     		final long endDiff = temp.endTime.getTime() - date.getTime();
@@ -409,9 +412,13 @@ public class EventAdapter extends BaseAdapter
 
     }
 
-    public void setItem(int position, EventHolder event)
+    public void setItem(int position, EventHolder event, boolean organize)
     {
         eventData.put(position, event);
+        
+        if (organize) {
+        	organizeEvents(currentTime);
+        }
     }
     
     protected class CountdownRunnable implements Runnable
@@ -431,9 +438,8 @@ public class EventAdapter extends BaseAdapter
 			for (int i = 0; i < getCount(); i++) {
 				EventHolder temp = eventData.get(i);
 				
-				if (temp.timeUntilNextEnd <= 0) {
-					temp.startTime = temp.startTimes[EventHolder.getClosestDate(temp.startTimes, currentTime)];
-					temp.endTime   = temp.endTimes[EventHolder.getClosestDate(temp.endTimes, currentTime)];
+				if (temp.timeUntilNextEnd <= 0 && null != eventUpdateInterface) {
+		    		temp = eventUpdateInterface.updateStartAndEndTimes(temp, currentTime);
 				}
 				
 				temp.timeUntilNextStart = temp.startTime.getTime() - currentTime.getTime();

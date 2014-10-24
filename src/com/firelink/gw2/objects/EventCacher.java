@@ -11,8 +11,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -136,6 +140,13 @@ public class EventCacher
 		File cacheFile = new File(getCachePath() + File.separator + EventCacher.CACHE_APIS_DIR + File.separator + fields.eventID);
 		String json = "";
 		
+		Date currentTime = new Date();
+		
+		try {
+			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
+    		currentTime = sd.parse(sd.format(Calendar.getInstance().getTime()));
+		} catch (ParseException e) {}
+		
 		if (cacheFile.exists())
 		{
 			try {
@@ -188,6 +199,7 @@ public class EventCacher
 		        	}
 	    		}
 	        	
+	    		fields.startTime = fields.startTimes[EventHolder.getClosestDate(fields.startTimes, currentTime)];
 	        	
 	        	//Figure out this time BS
 	    		if (fields.endTimes == null) {
@@ -199,6 +211,8 @@ public class EventCacher
 		        		fields.endTimes[i] = EventHolder.convertDateToLocal(timeEndArray.getString(i));
 		        	}
 	    		}
+	    		
+	    		fields.endTime = fields.endTimes[EventHolder.getClosestDate(fields.endTimes, currentTime)];
 	        	
 	        }
 	        catch (JSONException e)

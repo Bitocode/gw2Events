@@ -289,6 +289,8 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
 					break;
 				}
 				
+				
+				
 				results.add(tempHolder);
 			}
 
