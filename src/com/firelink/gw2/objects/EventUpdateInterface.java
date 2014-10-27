@@ -10,4 +10,6 @@ public interface EventUpdateInterface
 	 * @param index
 	 */
 	public abstract EventHolder updateStartAndEndTimes(EventHolder holder, Date date);
+	
+	public abstract void eventFinished();
 }

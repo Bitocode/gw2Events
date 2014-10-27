@@ -1,6 +1,7 @@
 package com.firelink.gw2.events;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map.Entry;
 
@@ -156,7 +157,7 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 	
 	/***************************************************
      *************************************************** 
-     *	Start of RefreshInterface methods
+     *	Start of EventUpdateInterface methods
      ***************************************************
      ***************************************************/
 	
@@ -169,14 +170,20 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 	@Override
 	public EventHolder updateStartAndEndTimes(EventHolder holder, Date date) 
 	{
-		if (holder.indexOffset > 0) {
-			//Do something else
-		} else {
-			holder.startTime = holder.startTimes[EventHolder.getClosestDate(holder.startTimes, date)];
-			holder.endTime = holder.endTimes[EventHolder.getClosestDate(holder.endTimes, date)];
-		}
+		int timeIndex = EventHolder.getClosestEventDates(holder.startTimes, holder.endTimes, date);
+		holder.startTime = holder.startTimes[timeIndex];
+		holder.endTime = holder.endTimes[timeIndex];
+		
+		holder.timeUntilNextStart = holder.startTime.getTime() - date.getTime();
+		holder.timeUntilNextEnd = holder.endTime.getTime() - date.getTime();
 		
 		return holder;
+	}
+	
+	@Override
+	public void eventFinished() 
+	{
+		eventAdapter.organizeEvents(null);
 	}
     
 	/***************************************************
@@ -214,7 +221,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     private void startCountdown()
     {
     	if (eventAdapter != null) {
-    		eventAdapter.startInfiniteCountdown();
+    		eventAdapter.startInfiniteCountdown(false);
+    		eventAdapter.organizeEvents(null);
     	}
     }
     
@@ -322,6 +330,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 						cancel(true);
 						break;
 					}
+					
+					tempHolder.isActive = EventHolder.isEventActive(tempHolder.startTime, tempHolder.endTime, Calendar.getInstance().getTime());
 					
 					results.add(tempHolder);
 				}

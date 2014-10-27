@@ -43,7 +43,7 @@ public class EventHolder implements Cloneable
      * @param dates
      * @return The index to the date closest to now
      */
-    public static int getClosestDate(Date[] dates, Date currDate)
+    public static int getClosestDate(Date[] dates, Date currDate, int indexOffset)
     {
     	long min = dates[0].getTime() - currDate.getTime();
     	long maxDate = dates[0].getTime(); 
@@ -81,9 +81,145 @@ public class EventHolder implements Cloneable
 			}
 		}
 		
+		if (indexOffset + startIndex > dates.length - 1) {
+			startIndex = (indexOffset + startIndex) - dates.length;
+		} else {
+			startIndex += indexOffset;
+		}
+		
 		return startIndex;
     	
     }
+    
+    /**
+     * 
+     * @param dates
+     * @return The index to the date closest to now
+     */
+    public static int getClosestEventDates(Date[] startDates, Date[] endDates, Date currDate)
+    {
+    	long min = startDates[0].getTime() - currDate.getTime();
+    	long maxDate = startDates[0].getTime(); 
+		int startIndex = 0;
+		boolean nextDay = false;
+		
+		for (int i = 0; i < startDates.length; i++) {
+			
+			if (startDates[i].getTime() == currDate.getTime()){
+				continue; 
+			}
+			
+			if (startDates[i].getTime() >= maxDate) {
+				maxDate = startDates[i].getTime();
+			} else {
+				nextDay = true;
+			}
+			
+			if (nextDay) {
+				Calendar calendar = Calendar.getInstance();
+    			calendar.setTime(startDates[i]);
+    			calendar.add(Calendar.DAY_OF_YEAR, 1);
+    			startDates[i] = calendar.getTime();
+			}
+			
+			long diff = startDates[i].getTime() - currDate.getTime();
+			
+			if (diff < startDates[i].getTime() - endDates[i].getTime()) {
+				continue;
+			}
+			
+			if (min > diff || min <= startDates[i].getTime() - endDates[i].getTime()) {
+				min = diff;
+				startIndex = i;
+			}
+		}
+		
+		return startIndex;
+    	
+    }
+    
+    /**
+     * 
+     * @param startTime
+     * @param endTime
+     * @param currentTime
+     * @return
+     */
+    public static boolean isEventActive(Date startTime, Date endTime, Date currentTime)
+    {
+    	//Make our dates into Calendars
+    	Calendar startCal = Calendar.getInstance();
+    	Calendar endCal   = Calendar.getInstance();
+    	Calendar currCal  = Calendar.getInstance();
+    	startCal.setTime(startTime);
+    	endCal.setTime(endTime);
+    	currCal.setTime(currentTime);
+    	
+    	//Set our start and end times to today's date
+    	startCal.set(Calendar.YEAR, currCal.get(Calendar.YEAR));
+    	startCal.set(Calendar.DAY_OF_YEAR, currCal.get(Calendar.DAY_OF_YEAR));
+    	endCal.set(Calendar.YEAR, currCal.get(Calendar.YEAR));
+    	endCal.set(Calendar.DAY_OF_YEAR, currCal.get(Calendar.DAY_OF_YEAR));
+    	
+    	if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+    		endCal.roll(Calendar.DAY_OF_YEAR, 1);
+    	}
+    	
+    	if (currCal.getTimeInMillis() >= startCal.getTimeInMillis() && currCal.getTimeInMillis() < endCal.getTimeInMillis()) {
+    		return true;
+    	} else if (currCal.getTimeInMillis() < endCal.getTimeInMillis() && endCal.getTimeInMillis() < startCal.getTimeInMillis()) {
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    /**
+     * 
+     * @param dates
+     * @return The index to the date closest to now
+     */
+//    public static int isDateWithinHours(Date date, Date currDate, long hours)
+//    {
+//    	long min = date.getTime() - currDate.getTime();
+//    	long maxDate = date.getTime(); 
+//		int startIndex = 0;
+//		boolean nextDay = false;
+//		
+//		for (int i = 0; i < dates.length; i++) {
+//			
+//			if (dates[i].getTime() == currDate.getTime()){
+//				continue; 
+//			}
+//			
+//			if (dates[i].getTime() >= maxDate) {
+//				maxDate = dates[i].getTime();
+//			} else {
+//				nextDay = true;
+//			}
+//			
+//			if (nextDay) {
+//				Calendar calendar = Calendar.getInstance();
+//    			calendar.setTime(dates[i]);
+//    			calendar.add(Calendar.DAY_OF_YEAR, 1);
+//    			dates[i] = calendar.getTime();
+//			}
+//			
+//			long diff = dates[i].getTime() - currDate.getTime();
+//			
+//			if (diff < 0) {
+//				continue;
+//			}
+//			
+//			if (min > diff || min <= 0) {
+//				min = diff;
+//				startIndex = i;
+//			}
+//		}
+//		
+//		return startIndex;
+//    	
+//    }
     
     /**
      * 

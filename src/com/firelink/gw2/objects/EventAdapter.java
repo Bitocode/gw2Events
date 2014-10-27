@@ -27,8 +27,18 @@ import android.widget.TextView;
 
 import com.firelink.gw2.events.R;
 
+/**
+ * 
+ * @author Justin
+ *
+ */
 public class EventAdapter extends BaseAdapter
 {	
+	/**
+	 * 
+	 * @author Justin
+	 *
+	 */
     static class ViewHolder
     {
         TextView eventNameTV;
@@ -94,55 +104,13 @@ public class EventAdapter extends BaseAdapter
             this.eventData.put(i, events[i]);
         }
     }
-
-    /**
-     * 
-     * @param name
-     * @param type
-     * @param typeID
-     */
-    public void add(EventHolder events)
-    {
-        this.eventData.put(getCount(), events);
-
-        this.notifyDataSetChanged();
-    }
     
-    /**
-     * 
-     * @param events
-     */
-    public void addWithoutNotify(EventHolder events)
-    {
-    	this.eventData.put(getCount(), events);
-    }
+    /***************************************************
+     *************************************************** 
+     *	Start of lifecycle methods
+     ***************************************************
+     ***************************************************/
     
-    /**
-     * 
-     */
-    public void empty()
-    {
-    	this.eventData.clear();
-    }
-    
-    /**
-     * 
-     * @param activity
-     */
-    public void setInterface(Activity activity)
-    {
-    	try {
-			childFragInto = (ChildFragmentInterface) activity;
-		} catch (ClassCastException e) {
-			Log.d("GW2Events", e.getMessage());
-		}
-    }
-    
-    public void setEventUpdateInterface(EventUpdateInterface eui)
-    {
-    	eventUpdateInterface = eui;
-    }
-
     /**
      * @param position
      * @param view
@@ -234,6 +202,149 @@ public class EventAdapter extends BaseAdapter
         return (convertView);
     }
     
+    /***************************************************
+     *************************************************** 
+     *	Start of EventAdapter data methods
+     ***************************************************
+     ***************************************************/
+
+    /**
+     * 
+     * @param name
+     * @param type
+     * @param typeID
+     */
+    public void add(EventHolder events)
+    {
+        this.eventData.put(getCount(), events);
+
+        this.notifyDataSetChanged();
+    }
+    /**
+     * 
+     * @param events
+     */
+    public void addWithoutNotify(EventHolder events)
+    {
+    	this.eventData.put(getCount(), events);
+    }
+    /**
+     * 
+     */
+    public void empty()
+    {
+    	this.eventData.clear();
+    }
+    /**
+     * 
+     */
+    @Override
+    public int getCount()
+    {
+        return this.eventData.size();
+    }
+    /**
+     * 
+     */
+    @Override
+    public EventHolder getItem(int position)
+    {
+        return eventData.get(position);
+    }
+    /**
+     * 
+     */
+    @Override
+    public long getItemId(int position)
+    {
+        return 0;
+
+    }
+    /**
+     * 
+     * @param position
+     * @param event
+     * @param organize
+     */
+    public void setItem(int position, EventHolder event, boolean organize)
+    {
+        eventData.put(position, event);
+        
+        if (organize) {
+        	organizeEvents(currentTime);
+        }
+    }
+    
+    /**
+     * 
+     * @param date
+     */
+    public void organizeEvents(Date date)
+    {
+    	if (null == date) {
+    		date = currentTime;
+    	}
+    	
+    	LongSparseArray<EventHolder> tempHolders = new LongSparseArray<EventHolder>();
+    	
+    	
+    	int numActive = 0;
+    	for (int i = 0; i < getCount(); i++) {
+    		EventHolder temp = eventData.get(i);
+    		Log.d("GW2Events", "i = " + i + " Event = " + temp.name);
+    		if (temp.startTimes == null) {
+    			return;
+    		}
+    		
+    		final long diff = temp.startTime.getTime() - date.getTime();
+    		
+    		if (temp.isActive) {
+    			tempHolders.put(numActive++, temp);
+    			continue;
+    		}
+    		
+			if (diff > 0) {
+				if (tempHolders.get(diff) == null) {
+					tempHolders.put(diff, temp);
+				} else {
+					tempHolders.put(diff + 1, temp);
+				}
+			}
+    	}
+    	
+    	for (int i = 0; i < tempHolders.size(); i++) {
+    		Log.i("GW2Events", "i = " + i + " Event = " + tempHolders.get(tempHolders.keyAt(i)).name);
+    		this.eventData.put(i, tempHolders.get(tempHolders.keyAt(i)));
+    	}
+    }
+    
+    /***************************************************
+     *************************************************** 
+     *	Start of Interface methods
+     ***************************************************
+     ***************************************************/
+    
+    /**
+     * 
+     * @param activity
+     */
+    public void setInterface(Activity activity)
+    {
+    	try {
+			childFragInto = (ChildFragmentInterface) activity;
+		} catch (ClassCastException e) {
+			Log.d("GW2Events", e.getMessage());
+		}
+    }
+    /**
+     * 
+     * @param eui
+     */
+    public void setEventUpdateInterface(EventUpdateInterface eui)
+    {
+    	eventUpdateInterface = eui;
+    }
+
     /**
      * 
      */
@@ -242,55 +353,29 @@ public class EventAdapter extends BaseAdapter
     	notifyDataSetChanged();
     }
     
+    
+    /***************************************************
+     *************************************************** 
+     *	Start of Countdown methods
+     ***************************************************
+     ***************************************************/
+    
     /**
      * 
      */
-    public void startInfiniteCountdown()
+    public void startInfiniteCountdown(boolean upcoming)
     {
-        organizeEvents(currentTime);
-        
     	if (mRunnable == null) {
-    		mRunnable = new CountdownRunnable();
+    		if (upcoming) {
+    			mRunnable = new CountdownRunnable();
+    		} else {
+    			mRunnable = new CountdownRunnable();
+    		}
     	}
+    	
+    	mHandler.removeCallbacks(mRunnable);
     	mHandler.post(mRunnable);
     }
-    
-    private void organizeEvents(Date date)
-    {
-    	LongSparseArray<EventHolder> tempHolders = new LongSparseArray<EventHolder>();
-    	
-    	
-    	int numActive = 0;
-    	for (int i = 0; i < getCount(); i++) {
-    		EventHolder temp = eventData.get(i);
-    		
-    		if (temp.startTimes == null) {
-    			return;
-    		}
-    		
-    		final long diff = temp.startTime.getTime() - date.getTime();
-    		final long endDiff = temp.endTime.getTime() - date.getTime();
-    		
-    		
-			if (diff > 0) {
-				if (endDiff < diff && endDiff > 0) {
-					tempHolders.put(numActive++, temp);
-				} else {
-					if (tempHolders.get(diff) == null) {
-						tempHolders.put(diff, temp);
-					} else {
-						tempHolders.put(diff + 1, temp);
-					}
-				}
-			}
-    	}
-    	
-    	for (int i = 0; i < tempHolders.size(); i++) {
-    		Log.d("GW2Events", "i = " + i + " Event = " + tempHolders.get(tempHolders.keyAt(i)).name);
-    		this.eventData.put(i, tempHolders.get(tempHolders.keyAt(i)));
-    	}
-    }
-    
     /**
      * 
      */
@@ -365,7 +450,6 @@ public class EventAdapter extends BaseAdapter
 			countDowns.get(key).start();
 		}
     }
-    
     /**
      * 
      */
@@ -384,43 +468,84 @@ public class EventAdapter extends BaseAdapter
     	}
     }
 
-    /**
-     * 
-     */
-    @Override
-    public int getCount()
-    {
-        return this.eventData.size();
-    }
-
-    /**
-     * 
-     */
-    @Override
-    public EventHolder getItem(int position)
-    {
-        return eventData.get(position);
-    }
-
-    /**
-     * 
-     */
-    @Override
-    public long getItemId(int position)
-    {
-        return 0;
-
-    }
-
-    public void setItem(int position, EventHolder event, boolean organize)
-    {
-        eventData.put(position, event);
-        
-        if (organize) {
-        	organizeEvents(currentTime);
-        }
-    }
     
+    /***************************************************
+     *************************************************** 
+     *	Start of Countdown class
+     ***************************************************
+     ***************************************************/
+    
+    /**
+     * 
+     * @author Justin
+     *
+     */
+//    protected class CountdownRunnable implements Runnable
+//    {
+//		@Override
+//		public void run() 
+//		{
+//			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+//			try {
+//				SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a",
+//						Locale.US);
+//				currentTime = sd.parse(sd.format(Calendar.getInstance().getTime()));
+//			} catch (ParseException e) {}
+//			
+//			boolean thereIsAnUpdate = false;
+//			for (int i = 0; i < getCount(); i++) {
+//				EventHolder temp = eventData.get(i);
+//				
+//				if (temp.timeUntilNextEnd <= 0 && null != eventUpdateInterface) {
+//					temp = eventUpdateInterface.updateStartAndEndTimes(temp, currentTime);
+//				}
+//				
+//				temp.timeUntilNextStart = temp.startTime.getTime() - currentTime.getTime();
+//				temp.timeUntilNextEnd = temp.endTime.getTime() - currentTime.getTime();
+//				
+//				if (!EventHolder.isEventActive(temp.startTime, temp.endTime, currentTime)) {
+//					if (temp.isActive) {
+//						temp.isActive = false;
+//					}
+//					
+//					int hours = (int) ((temp.timeUntilNextStart / 1000) / 60) / 60;
+//					int minutes = (int) (temp.timeUntilNextStart / 1000) / 60 % 60;
+//					int seconds = (int) (temp.timeUntilNextStart / 1000) % 60 % 60;
+//					
+//					// Display CountDown
+//					temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
+//				} else {
+//					if (!temp.isActive) {
+//						temp.isActive = true;
+//						thereIsAnUpdate = true;
+//					}
+//					
+//					temp.countdownTimer = "Active";
+//				}
+//				eventData.setValueAt(i, temp);
+//			}
+//			if (thereIsAnUpdate) {
+//				// Organize
+//				organizeEvents(currentTime);
+//				thereIsAnUpdate = false;
+//			}
+//			Message message = mHandler.obtainMessage(UPDATE_UI);
+//			mHandler.dispatchMessage(message);
+//			mHandler.postDelayed(this, TIMER_INTERVAL_MS);
+//		}
+//	}
+    
+    /***************************************************
+     *************************************************** 
+     *	Start of Countdown class
+     ***************************************************
+     ***************************************************/
+    
+    /**
+     * 
+     * @author Justin
+     *
+     */
     protected class CountdownRunnable implements Runnable
     {
 		@Override
@@ -430,7 +555,6 @@ public class EventAdapter extends BaseAdapter
 	    	try {
 				SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
 	    		currentTime = sd.parse(sd.format(Calendar.getInstance().getTime()));
-				//date = sd.parse("10:44:55 AM");
 			} catch (ParseException e) {}
 			
 	    	boolean thereIsAnUpdate = false;
@@ -439,19 +563,19 @@ public class EventAdapter extends BaseAdapter
 				EventHolder temp = eventData.get(i);
 				
 				if (temp.timeUntilNextEnd <= 0 && null != eventUpdateInterface) {
-		    		temp = eventUpdateInterface.updateStartAndEndTimes(temp, currentTime);
+					temp = eventUpdateInterface.updateStartAndEndTimes(temp, currentTime);
 				}
-				
+					
 				temp.timeUntilNextStart = temp.startTime.getTime() - currentTime.getTime();
-				temp.timeUntilNextEnd = temp.endTime.getTime() - currentTime.getTime();
+				temp.timeUntilNextEnd   = temp.endTime.getTime() - currentTime.getTime();
 				
-				if (temp.timeUntilNextStart > 0 && temp.timeUntilNextStart < temp.timeUntilNextEnd) {
+				if (temp.timeUntilNextStart > 0) {
 					
 					if (temp.isActive) {
 						temp.isActive = false;
 					}
 					
-					int hours = (int)((temp.timeUntilNextStart / 1000) / 60) / 60;
+					int hours   = (int)((temp.timeUntilNextStart / 1000) / 60) / 60;
 					int minutes = (int)(temp.timeUntilNextStart / 1000) / 60 % 60;
 					int seconds = (int)(temp.timeUntilNextStart / 1000) % 60 % 60;
 					
@@ -460,10 +584,11 @@ public class EventAdapter extends BaseAdapter
 				} else {
 					if (!temp.isActive) {
 						temp.isActive = true;
-						temp.countdownTimer = "Active";
 						
 						thereIsAnUpdate = true;
 					}
+					
+					temp.countdownTimer = "Active";
 				}
 				
 		    	eventData.setValueAt(i, temp);
@@ -471,7 +596,10 @@ public class EventAdapter extends BaseAdapter
 			
 			if (thereIsAnUpdate) {
 		    	//Organize
-		    	organizeEvents(currentTime);
+		    	if (null != eventUpdateInterface) {
+		    		eventUpdateInterface.eventFinished();
+		    	}
+		    	
 		    	thereIsAnUpdate = false;
 			}
 			

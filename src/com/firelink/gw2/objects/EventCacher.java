@@ -145,6 +145,7 @@ public class EventCacher
 		try {
 			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
     		currentTime = sd.parse(sd.format(Calendar.getInstance().getTime()));
+			//currentTime = sd.parse("08:44:55 PM");
 		} catch (ParseException e) {}
 		
 		if (cacheFile.exists())
@@ -199,8 +200,6 @@ public class EventCacher
 		        	}
 	    		}
 	        	
-	    		fields.startTime = fields.startTimes[EventHolder.getClosestDate(fields.startTimes, currentTime)];
-	        	
 	        	//Figure out this time BS
 	    		if (fields.endTimes == null) {
 	    			JSONArray timeEndArray = eventObject.getJSONArray("end_times");
@@ -212,8 +211,12 @@ public class EventCacher
 		        	}
 	    		}
 	    		
-	    		fields.endTime = fields.endTimes[EventHolder.getClosestDate(fields.endTimes, currentTime)];
-	        	
+	    		int timeIndex = EventHolder.getClosestEventDates(fields.startTimes, fields.endTimes, currentTime);
+	    		fields.startTime = fields.startTimes[timeIndex];
+	    		fields.timeUntilNextStart = fields.startTime.getTime() - currentTime.getTime();
+	    		
+	    		fields.endTime = fields.endTimes[timeIndex];
+	    		fields.timeUntilNextEnd = fields.endTime.getTime() - currentTime.getTime();
 	        }
 	        catch (JSONException e)
 	        {

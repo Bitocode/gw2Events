@@ -1,6 +1,8 @@
 package com.firelink.gw2.events;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map.Entry;
 
 import android.app.ActionBar;
@@ -22,10 +24,11 @@ import android.widget.TextView;
 import com.firelink.gw2.objects.EventAdapter;
 import com.firelink.gw2.objects.EventCacher;
 import com.firelink.gw2.objects.EventHolder;
+import com.firelink.gw2.objects.EventUpdateInterface;
 import com.firelink.gw2.objects.RefreshInterface;
 import com.firelink.gw2.objects.TaskCompletedInterface;
 
-public class EventLocalUpcomingFragment extends Fragment implements RefreshInterface, TaskCompletedInterface
+public class EventLocalUpcomingFragment extends Fragment implements RefreshInterface, TaskCompletedInterface, EventUpdateInterface
 {
 	//High level fields
     protected Activity activity;
@@ -151,6 +154,37 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
         
         new DisplayData().execute();
     }
+	
+	/***************************************************
+     *************************************************** 
+     *	Start of EventUpdateInterface methods
+     ***************************************************
+     ***************************************************/
+	
+	/**
+	 *
+	 * @param holder
+	 * @param date
+	 * @return EventHolder
+	 */
+	@Override
+	public EventHolder updateStartAndEndTimes(EventHolder holder, Date date) 
+	{
+		int timeIndex = EventHolder.getClosestEventDates(holder.startTimes, holder.endTimes, date);
+		holder.startTime = holder.startTimes[timeIndex];
+		holder.endTime = holder.endTimes[timeIndex];
+		
+		holder.timeUntilNextStart = holder.startTime.getTime() - date.getTime();
+		holder.timeUntilNextEnd = holder.endTime.getTime() - date.getTime();
+		
+		return holder;
+	}
+	
+	@Override
+	public void eventFinished() 
+	{
+		
+	}
     
 	/***************************************************
      *************************************************** 
@@ -187,7 +221,7 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
     private void startCountdown()
     {
     	if (eventAdapter != null) {
-    		eventAdapter.startInfiniteCountdown();
+    		eventAdapter.startInfiniteCountdown(true);
     	}
     }
     
@@ -218,6 +252,7 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
 
         if (eventAdapter == null) {
         	eventAdapter = new EventAdapter(context);
+        	eventAdapter.setEventUpdateInterface((EventUpdateInterface)fragment);
         	refresh();
         } else {
         	eventListView.setAdapter(eventAdapter);
@@ -276,6 +311,7 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
 		@Override
 		protected ArrayList<EventHolder> doInBackground(Void... params) 
 		{			
+			Date currTime = Calendar.getInstance().getTime();
 			ArrayList<EventHolder> results = new ArrayList<EventHolder>();
 			
 			for (Entry<String, EventHolder> entry : EventCacher.getCachedEventNames(context).entrySet()) {
@@ -289,9 +325,72 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
 					break;
 				}
 				
-				
-				
-				results.add(tempHolder);
+				eventHolder = tempHolder;
+				tempHolder = null;
+				//Check how many times this event occurs within X hours
+				boolean useNextDayAM = false;
+				int offset = 0;
+				for (int i = 0; i < eventHolder.startTimes.length; i++) {
+					//Make a duplicate EventHolder
+					EventHolder thisHolder = new EventHolder();
+					try {
+						thisHolder = eventHolder.clone();
+					} catch (CloneNotSupportedException e) {
+						// TODO Auto-generated catch block
+						break;
+					}
+					
+					//Convert dates to today
+					Date startTime = thisHolder.startTimes[i];
+					Date endTime = thisHolder.endTimes[i];
+					
+					if (useNextDayAM) {
+						Calendar nB = Calendar.getInstance();
+						nB.setTime(endTime);
+						nB.add(Calendar.DAY_OF_YEAR, 1);
+						endTime   = nB.getTime();
+					}
+					
+					if (endTime.getTime() < startTime.getTime()) {
+						Calendar c = Calendar.getInstance();
+						c.setTime(endTime);
+						c.add(Calendar.DAY_OF_YEAR, 1);
+						endTime = c.getTime();
+					}
+					
+					Calendar a = Calendar.getInstance();
+					Calendar b = Calendar.getInstance();
+					long eventLength = endTime.getTime() - startTime.getTime();
+					long timeDiff = 0;
+					
+					b.setTime(startTime);
+					a.set(Calendar.HOUR_OF_DAY, b.get(Calendar.HOUR_OF_DAY));
+					a.set(Calendar.MINUTE, b.get(Calendar.MINUTE));
+					a.set(Calendar.SECOND, b.get(Calendar.SECOND));
+					
+					if (useNextDayAM) {
+						a.add(Calendar.DAY_OF_YEAR, 1);
+					}
+					
+					//Test for 2 hours
+					timeDiff = a.getTimeInMillis() - currTime.getTime();
+					
+					if (timeDiff < (3 * 60 * 60 * 1000) && timeDiff > -eventLength) {
+						thisHolder.startTime = thisHolder.startTimes[i];
+						thisHolder.endTime = thisHolder.endTimes[i];
+						thisHolder.isActive = EventHolder.isEventActive(thisHolder.startTime, thisHolder.endTime, currTime);
+						offset++;
+						results.add(thisHolder);
+					}
+					
+					//try again for the next day
+					if (i == (thisHolder.startTimes.length - 1)) {
+						if (!useNextDayAM) {
+							useNextDayAM = true;
+							i = 0;
+						}
+					}
+				}
 			}
 
 			return results;
