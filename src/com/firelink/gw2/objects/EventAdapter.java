@@ -1,16 +1,9 @@
 package com.firelink.gw2.objects;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -52,8 +45,6 @@ public class EventAdapter extends BaseAdapter
 
     private Context context;
     private SparseArray<EventHolder> eventData;
-    private HashMap<String, CountDownTimer> countDowns;
-    private ChildFragmentInterface childFragInto;
     private EventUpdateInterface eventUpdateInterface;
     private Runnable mRunnable;
     private Handler mHandler;
@@ -69,7 +60,6 @@ public class EventAdapter extends BaseAdapter
 
         this.context   = context;
         this.eventData = new SparseArray<EventHolder>();
-        this.countDowns = new HashMap<String, CountDownTimer>();
         this.mHandler = new Handler(Looper.getMainLooper()) {
         	@Override
         	public void handleMessage(Message msg) 
@@ -80,10 +70,7 @@ public class EventAdapter extends BaseAdapter
         	}
         };
         
-        try {
-			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
-    		this.currentTime = sd.parse(sd.format(Calendar.getInstance().getTime()));
-		} catch (ParseException e) {}
+    	this.currentTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -303,6 +290,8 @@ public class EventAdapter extends BaseAdapter
     			continue;
     		}
     		
+    		Log.d("GW2Events", "i = " + i + " Event = " + temp.name + " Diff = " + diff + " isActive = " + temp.isActive);
+    		
 			if (diff > 0) {
 				if (tempHolders.get(diff) == null) {
 					tempHolders.put(diff, temp);
@@ -324,18 +313,6 @@ public class EventAdapter extends BaseAdapter
      ***************************************************
      ***************************************************/
     
-    /**
-     * 
-     * @param activity
-     */
-    public void setInterface(Activity activity)
-    {
-    	try {
-			childFragInto = (ChildFragmentInterface) activity;
-		} catch (ClassCastException e) {
-			Log.d("GW2Events", e.getMessage());
-		}
-    }
     /**
      * 
      * @param eui
@@ -363,106 +340,21 @@ public class EventAdapter extends BaseAdapter
     /**
      * 
      */
-    public void startInfiniteCountdown(boolean upcoming)
+    public void startEventCountdown()
     {
     	if (mRunnable == null) {
-    		if (upcoming) {
-    			mRunnable = new CountdownRunnable();
-    		} else {
-    			mRunnable = new CountdownRunnable();
-    		}
+    		mRunnable = new CountdownRunnable();
     	}
     	
     	mHandler.removeCallbacks(mRunnable);
     	mHandler.post(mRunnable);
     }
-    /**
-     * 
-     */
-    public void startCountdown()
-    {
-    	countDowns.clear();
-    	
-    	Date date = new Date();
-    	try {
-			SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
-    		date = sd.parse(sd.format(Calendar.getInstance().getTime()));
-			//date = sd.parse("11:30:55 PM");
-		} catch (ParseException e) {}
-    	
-    	for (int i = 0; i < getCount(); i++) {
-    		final EventHolder temp = getItem(i);
-    		
-    		final long diff;
-    		final long firstCheck = temp.startTime.getTime() - date.getTime();
-    		
-    		if (firstCheck <= -(1000 * 60 * 15)) {
-    			Log.d("GW2Events", firstCheck + " Something");
-    			Calendar calendar = Calendar.getInstance();
-    			calendar.setTime(temp.startTime);
-    			calendar.add(Calendar.DAY_OF_YEAR, 1);
-    			temp.startTime = calendar.getTime();
-    			
-    			diff = temp.startTime.getTime() - date.getTime();
-    		} else {
-    			diff = firstCheck;
-    		}
-    		
-    		if (diff >= -500 && !temp.isActive) {
-    			CountDownTimer timer = new CountDownTimer(diff + 2000, 1000) {
-					
-					@Override
-					public void onTick(long millisUntilFinished) {
-						if (diff > 0) {
-							int hours = (int)((millisUntilFinished / 1000) / 60) / 60;
-							int minutes = (int)(millisUntilFinished / 1000) / 60 % 60;
-							int seconds = (int)(millisUntilFinished / 1000) % 60 % 60;
-							
-							//Display CountDown
-							temp.countdownTimer = String.format("%02d", hours) + ":" + String.format("%02d", minutes) + ":" + String.format("%02d", seconds);
-						} else {
-							temp.countdownTimer = "Active";
-						}
-						
-						refreshView();
-					}
-					
-					@Override
-					public void onFinish() {
-						if (childFragInto != null) {
-							childFragInto.forceRefresh();
-						} else {
-							temp.isActive = true;
-							temp.countdownTimer = "Active";
-						}
-					}
-				};
-				
-				countDowns.put(i + "", timer);
-    		} else {
-    			temp.countdownTimer = "Active";
-    		}
-    	}
-    	
-    	Iterator<String> i = countDowns.keySet().iterator();
-		while (i.hasNext()) {
-			String key = i.next();
-			countDowns.get(key).start();
-		}
-    }
+    
     /**
      * 
      */
     public void stopCountdown()
     {
-    	if (countDowns != null) {
-    		Iterator<String> i = countDowns.keySet().iterator();
-    		while (i.hasNext()) {
-    			String key = i.next();
-    			countDowns.get(key).cancel();
-    		}
-    	}
-    	
     	if (null != mHandler) {
     		mHandler.removeCallbacks(mRunnable);
     	}
@@ -552,10 +444,7 @@ public class EventAdapter extends BaseAdapter
 		public void run() {
 			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 			
-	    	try {
-				SimpleDateFormat sd = new SimpleDateFormat("hh:mm:ss a", Locale.US);
-	    		currentTime = sd.parse(sd.format(Calendar.getInstance().getTime()));
-			} catch (ParseException e) {}
+	    	currentTime = Calendar.getInstance().getTime();
 			
 	    	boolean thereIsAnUpdate = false;
 	    	

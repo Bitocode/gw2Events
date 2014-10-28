@@ -101,7 +101,6 @@ public class EventHolder implements Cloneable
     	long min = startDates[0].getTime() - currDate.getTime();
     	long maxDate = startDates[0].getTime(); 
 		int startIndex = 0;
-		boolean nextDay = false;
 		
 		for (int i = 0; i < startDates.length; i++) {
 			
@@ -111,15 +110,6 @@ public class EventHolder implements Cloneable
 			
 			if (startDates[i].getTime() >= maxDate) {
 				maxDate = startDates[i].getTime();
-			} else {
-				nextDay = true;
-			}
-			
-			if (nextDay) {
-				Calendar calendar = Calendar.getInstance();
-    			calendar.setTime(startDates[i]);
-    			calendar.add(Calendar.DAY_OF_YEAR, 1);
-    			startDates[i] = calendar.getTime();
 			}
 			
 			long diff = startDates[i].getTime() - currDate.getTime();
@@ -140,6 +130,47 @@ public class EventHolder implements Cloneable
     
     /**
      * 
+     * @param holder
+     * @param currentTime
+     * @return
+     */
+    public static EventHolder parseDates(EventHolder holder, Date currentTime)
+    {
+    	Date[] startDates = holder.startTimes;
+    	Date[] endDates = holder.endTimes;
+    	
+    	Calendar currentCal = Calendar.getInstance();
+    	currentCal.setTime(currentTime);
+    	
+    	for (int i = 0; i < startDates.length; i++)
+    	{
+    		Calendar startCal = Calendar.getInstance();
+    		Calendar endCal   = Calendar.getInstance();
+    		
+    		startCal.setTime(startDates[i]);
+    		startCal.set(Calendar.YEAR, currentCal.get(Calendar.YEAR));
+    		startCal.set(Calendar.DAY_OF_YEAR, currentCal.get(Calendar.DAY_OF_YEAR));
+    		
+    		endCal.setTime(endDates[i]);
+    		endCal.set(Calendar.YEAR, currentCal.get(Calendar.YEAR));
+    		endCal.set(Calendar.DAY_OF_YEAR, currentCal.get(Calendar.DAY_OF_YEAR));
+    		
+    		if (startCal.getTimeInMillis() < currentCal.getTimeInMillis() && endCal.getTimeInMillis() < currentCal.getTimeInMillis()) {
+    			startCal.roll(Calendar.DAY_OF_YEAR, 1);
+    			endCal.roll(Calendar.DAY_OF_YEAR, 1);
+    		} else if (startCal.getTimeInMillis() > currentCal.getTimeInMillis() && endCal.getTimeInMillis() < currentCal.getTimeInMillis()) {
+    			endCal.roll(Calendar.DAY_OF_YEAR, 1);
+    		}
+    		
+    		holder.startTimes[i] = startCal.getTime();
+    		holder.endTimes[i] = endCal.getTime();
+    	}
+    	
+    	return holder;
+    }
+    
+    /**
+     * 
      * @param startTime
      * @param endTime
      * @param currentTime
@@ -154,16 +185,6 @@ public class EventHolder implements Cloneable
     	startCal.setTime(startTime);
     	endCal.setTime(endTime);
     	currCal.setTime(currentTime);
-    	
-    	//Set our start and end times to today's date
-    	startCal.set(Calendar.YEAR, currCal.get(Calendar.YEAR));
-    	startCal.set(Calendar.DAY_OF_YEAR, currCal.get(Calendar.DAY_OF_YEAR));
-    	endCal.set(Calendar.YEAR, currCal.get(Calendar.YEAR));
-    	endCal.set(Calendar.DAY_OF_YEAR, currCal.get(Calendar.DAY_OF_YEAR));
-    	
-    	if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
-    		endCal.roll(Calendar.DAY_OF_YEAR, 1);
-    	}
     	
     	if (currCal.getTimeInMillis() >= startCal.getTimeInMillis() && currCal.getTimeInMillis() < endCal.getTimeInMillis()) {
     		return true;

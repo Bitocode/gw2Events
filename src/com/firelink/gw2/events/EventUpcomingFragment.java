@@ -165,7 +165,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
     private void startCountdown()
     {
     	if (eventAdapter != null) {
-    		eventAdapter.startCountdown();
+    		//eventAdapter.startCountdown();
     	}
     }
     
@@ -191,7 +191,7 @@ public class EventUpcomingFragment extends Fragment implements RefreshInterface
 
         if (eventAdapter == null) {
         	eventAdapter = new EventAdapter(context);
-        	eventAdapter.setInterface(getActivity());
+        	//eventAdapter.setInterface(getActivity());
             new EventSelectAPI().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
         	eventListView.setAdapter(eventAdapter);

@@ -170,6 +170,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 	@Override
 	public EventHolder updateStartAndEndTimes(EventHolder holder, Date date) 
 	{
+		holder = EventHolder.parseDates(holder, date);
+		
 		int timeIndex = EventHolder.getClosestEventDates(holder.startTimes, holder.endTimes, date);
 		holder.startTime = holder.startTimes[timeIndex];
 		holder.endTime = holder.endTimes[timeIndex];
@@ -221,8 +223,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
     private void startCountdown()
     {
     	if (eventAdapter != null) {
-    		eventAdapter.startInfiniteCountdown(false);
     		eventAdapter.organizeEvents(null);
+    		eventAdapter.startEventCountdown();
     	}
     }
     
@@ -347,8 +349,8 @@ public class EventSubscribedFragment extends Fragment implements RefreshInterfac
 				eventAdapter.add(holder);
 			}
 			
-			startCountdown();
 			eventListView.setAdapter(eventAdapter);
+			startCountdown();
 			eventProgDialog.dismiss();
 		}
 		

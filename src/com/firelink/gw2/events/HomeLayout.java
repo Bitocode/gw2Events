@@ -76,12 +76,11 @@ public class HomeLayout extends Activity implements ChildFragmentInterface, Serv
         }
 		        
 		//The "tabs"
-		jEventViews = new String[]{"Event Names", "Upcoming Events", "Subscribed Events", "Upcoming Test"};
+		jEventViews = new String[]{"Event Names", "Upcoming Events", "Subscribed Events"};
 		jEventClasses = new ArrayList<Class<?>>();
 		jEventClasses.add(EventNamesFragment.class);
-		jEventClasses.add(EventUpcomingFragment.class);
-		jEventClasses.add(EventSubscribedFragment.class);
 		jEventClasses.add(EventLocalUpcomingFragment.class);
+		jEventClasses.add(EventSubscribedFragment.class);
 		jEventClasses.add(ServerSelectFragment.class);
 		
 		//Set our views
