@@ -186,7 +186,7 @@ public class EventHolder implements Cloneable
     	endCal.setTime(endTime);
     	currCal.setTime(currentTime);
     	
-    	if (currCal.getTimeInMillis() >= startCal.getTimeInMillis() && currCal.getTimeInMillis() < endCal.getTimeInMillis()) {
+    	if (currCal.getTimeInMillis() > startCal.getTimeInMillis() && currCal.getTimeInMillis() < endCal.getTimeInMillis()) {
     		return true;
     	} else if (currCal.getTimeInMillis() < endCal.getTimeInMillis() && endCal.getTimeInMillis() < startCal.getTimeInMillis()) {
     		return true;

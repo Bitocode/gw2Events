@@ -451,6 +451,8 @@ public class EventAdapter extends BaseAdapter
 			for (int i = 0; i < getCount(); i++) {
 				EventHolder temp = eventData.get(i);
 				
+				temp.timeUntilNextEnd   = temp.endTime.getTime() - currentTime.getTime();
+				
 				if (temp.timeUntilNextEnd <= 0 && null != eventUpdateInterface) {
 					temp = eventUpdateInterface.updateStartAndEndTimes(temp, currentTime);
 				}
@@ -458,10 +460,12 @@ public class EventAdapter extends BaseAdapter
 				temp.timeUntilNextStart = temp.startTime.getTime() - currentTime.getTime();
 				temp.timeUntilNextEnd   = temp.endTime.getTime() - currentTime.getTime();
 				
-				if (temp.timeUntilNextStart > 0) {
+				if (temp.timeUntilNextStart >= 0) {
 					
 					if (temp.isActive) {
 						temp.isActive = false;
+						
+						thereIsAnUpdate = true;
 					}
 					
 					int hours   = (int)((temp.timeUntilNextStart / 1000) / 60) / 60;

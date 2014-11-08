@@ -185,7 +185,7 @@ public class EventLocalUpcomingFragment extends Fragment implements RefreshInter
 	@Override
 	public void eventFinished() 
 	{
-		
+		eventAdapter.organizeEvents(null);
 	}
     
 	/***************************************************
