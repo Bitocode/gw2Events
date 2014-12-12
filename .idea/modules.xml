@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/gw2events.iml" filepath="$PROJECT_DIR$/.idea/gw2events.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gw2Events.iml" filepath="$PROJECT_DIR$/gw2Events.iml" />
     </modules>
   </component>
 </project>

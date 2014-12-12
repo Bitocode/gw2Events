@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/eventDetailsView_eventImageView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/the_specific_event_image" />
+    
+        <!-- Headers -->
+        <TextView
+            android:id="@+id/eventDetailsView_descriptionHeaderTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_eventImageView"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:shadowColor="#000"
+            android:shadowDx="1"
+            android:shadowDy="-1"
+            android:shadowRadius="0.2"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/event_description" />
+        
+        <TextView
+            android:id="@+id/eventDetailsView_startTimesHeaderTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/eventDetailsView_descriptionTextView"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:shadowColor="#000"
+            android:shadowDx="1"
+            android:shadowDy="-1"
+            android:shadowRadius="0.2"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/event_times" />
+        
+        <!-- Details -->
+        <TextView
+            android:id="@id/eventDetailsView_descriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_descriptionHeaderTextView"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/eventDetailsView_startTimesTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventDetailsView_startTimesHeaderTextView"
+            android:gravity="center"
+            android:shadowColor="#FFF"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+        
+        <TextView 
+            android:id="@+id/eventDetailsView_errorView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center_horizontal"
+            android:background="@color/white"
+            android:text="@string/something_happened_"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+</ScrollView><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/layout/event_details_layout.xml -->

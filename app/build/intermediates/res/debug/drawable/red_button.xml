@@ -1,0 +1,21 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_pressed="true">
+		<shape>
+			<solid
+				android:color="#ff4466"		
+			/>
+		</shape>
+	</item>
+	
+		<item>
+		<shape>
+			<gradient
+				android:angle="270"
+				android:startColor="#CC0000"
+				android:endColor="#550000"
+				android:type="linear"
+			/>
+		</shape>
+	</item>
+</selector>
+<!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/drawable/red_button.xml -->

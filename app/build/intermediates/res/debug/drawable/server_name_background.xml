@@ -1,0 +1,19 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item>
+		<shape>
+		    <solid 
+		        android:color="#000" />
+			<gradient
+				android:angle="270"
+				android:startColor="#C00"
+				android:endColor="#00FFFFFF"
+				android:type="linear"
+			/>
+		</shape>
+	</item>
+	<item>
+	    <bitmap 
+	        android:src="@drawable/gw2_header" />
+	</item>
+</layer-list>
+<!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/drawable/server_name_background.xml -->

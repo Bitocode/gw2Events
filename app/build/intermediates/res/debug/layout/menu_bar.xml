@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/eventDetailsView_relativeContainer"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    android:orientation="vertical" >
+    
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="50dp"
+        android:background="@android:color/black">
+    </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/eventDetailsView_gw2HeaderImageView"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@string/just_a_logo"
+        android:scaleType="fitXY"
+        android:src="@drawable/gw2_header3" />
+
+    <ImageView
+        android:id="@+id/eventDetailsView_gw2LogoImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@string/just_a_logo"
+        android:scaleType="fitStart"
+        android:src="@drawable/gw2logo_transparent" />
+
+    <TextView
+        android:id="@+id/menuBar_logoTextView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginRight="5dp"
+        android:gravity="center|right"
+        android:shadowColor="#000"
+        android:shadowDx="2"
+        android:shadowDy="-2"
+        android:shadowRadius="0.2"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+</RelativeLayout><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/layout/menu_bar.xml -->

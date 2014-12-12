@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+   
+    <item android:state_selected="true"
+        android:state_activated="true"
+        android:drawable="@color/gw_red" />
+    
+    <item android:state_activated="true"
+        android:drawable="@color/gw_red" />
+    
+    <item android:state_selected="true"
+        android:drawable="@color/gw_red" />
+    
+    <item android:state_pressed="true"
+          android:drawable="@color/gw_red_lighter" />
+    
+    <item android:drawable="@android:color/transparent" />
+    
+</selector><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/drawable/event_selector_background_selected.xml -->

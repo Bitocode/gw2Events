@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item> 
+    <shape android:shape="rectangle">
+      <solid android:color="@color/gw_event_level_high" /> 
+    </shape>
+  </item>   
+    <item android:left="5dp" >  
+     <shape android:shape="rectangle"> 
+      <solid android:color="@android:color/transparent" />
+    </shape>
+   </item>    
+ </layer-list><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/drawable/event_level_high.xml -->

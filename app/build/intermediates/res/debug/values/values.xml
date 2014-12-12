@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/values/color.xml -->
+    <eat-comment/>
+    <color name="aqua">#00FFFF</color>
+    <color name="black">#000000</color>
+    <color name="blue">#0000FF</color>
+    <color name="fuchsia">#FF00FF</color>
+    <color name="gray">#808080</color>
+    <color name="green">#008000</color>
+    <color name="gw_event_level_high">#DC2627</color>
+    <color name="gw_event_level_high_pressed">#ED3738</color>
+    <color name="gw_event_level_low">#CCC1AA</color>
+    <color name="gw_event_level_low_pressed">#DDD2BB</color>
+    <color name="gw_event_level_standard">#F7B84E</color>
+    <color name="gw_event_level_standard_pressed">#F8C95F</color>
+    <color name="gw_red">#DC241F</color>
+    <color name="gw_red_lighter">#FF574F</color>
+    <color name="lime">#00FF00</color>
+    <color name="maroon">#800000</color>
+    <color name="navy">#000080</color>
+    <color name="olive">#808000</color>
+    <color name="purple">#800080</color>
+    <color name="red">#AA0000</color>
+    <color name="silver">#C0C0C0</color>
+    <color name="teal">#008080</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="yellow">#FFFF00</color>
+    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="app_label">Guild Wars 2 Event Timer</string>
+    <string name="app_name">GW2EventTimers</string>
+    <string name="drawer_close">Test Close</string>
+    <string name="drawer_open">Test Open</string>
+    <string name="event_description">Event Description</string>
+    <string name="event_times">Event Times</string>
+    <string name="hello">Hello World, MainActivity!</string>
+    <string name="just_a_logo">Just a logo</string>
+    <string name="next_event_countdown">Next Event Countdown</string>
+    <string name="nothing">Nothing</string>
+    <string name="please_select_your_default_server_you_can_always_change_this_later_in_the_settings_">Please select your default server. You can always change this later in the settings.</string>
+    <string name="select_a_region">Select a region</string>
+    <string name="select_a_server">Select a server</string>
+    <string name="select_server">Select Server</string>
+    <string name="something_happened_">Something happened...</string>
+    <string name="the_specific_event_image">The specific event image</string>
+    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/values/themes.xml -->
+    <eat-comment/>
+    <style name="CustomActionBarTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:homeAsUpIndicator">@drawable/customhomenav</item>
+        <item name="android:spinnerItemStyle">@style/Spinner.Dark</item>
+    </style>
+    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:background">@drawable/gw2_header3</item>
+        <item name="android:icon">@drawable/gw2logo_transparent_white</item>
+        <item name="android:titleTextStyle">@style/MyActionBar.Title</item>
+        <item name="android:subtitleTextStyle">@style/MyActionBar.Subtitle</item>
+        <item name="android:displayOptions">showHome|useLogo|</item>
+    </style>
+    <style name="MyActionBar.Subtitle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle">
+        <item name="android:shadowColor">#000</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">0.8</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="MyActionBar.Title" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:shadowColor">#000</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">0.8</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="Spinner.Dark" parent="@android:style/TextAppearance.Widget.TextView.SpinnerItem">
+        <item name="android:textColor">#000</item>
+    </style>
+</resources>

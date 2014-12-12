@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item android:state_pressed="true"
+          android:color="@color/white" />
+    
+    <item android:state_activated="true"
+          android:color="@color/white" />
+    
+    <item android:state_focused="true"
+          android:color="@color/white" />
+    
+    <item android:color="@color/black" />
+</selector><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/color/event_selector_text.xml -->
