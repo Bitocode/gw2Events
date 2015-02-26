@@ -15,4 +15,4 @@
           android:drawable="@color/red" />
     
     <item android:drawable="@android:color/transparent" />
-</selector><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/drawable/server_selector_background.xml -->
+</selector><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/app/src/main/res/drawable/server_selector_background.xml -->

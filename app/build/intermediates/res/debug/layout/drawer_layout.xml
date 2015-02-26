@@ -21,4 +21,4 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:background="#ddd" />
-</android.support.v4.widget.DrawerLayout><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/layout/drawer_layout.xml -->
+</android.support.v4.widget.DrawerLayout><!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/app/src/main/res/layout/drawer_layout.xml -->

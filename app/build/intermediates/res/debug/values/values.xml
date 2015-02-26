@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/values/color.xml -->
+    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/app/src/main/res/values/color.xml -->
     <eat-comment/>
     <color name="aqua">#00FFFF</color>
     <color name="black">#000000</color>
@@ -27,7 +27,7 @@
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
     <color name="yellow">#FFFF00</color>
-    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="app_label">Guild Wars 2 Event Timer</string>
     <string name="app_name">GW2EventTimers</string>
@@ -45,7 +45,7 @@
     <string name="select_server">Select Server</string>
     <string name="something_happened_">Something happened...</string>
     <string name="the_specific_event_image">The specific event image</string>
-    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/gw2Events1/app/src/main/res/values/themes.xml -->
+    <!-- From: file:/D:/Programming/Android/Guild%20Wars%202%20Events/app/src/main/res/values/themes.xml -->
     <eat-comment/>
     <style name="CustomActionBarTheme" parent="@android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
